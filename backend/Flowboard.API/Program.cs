@@ -1,16 +1,26 @@
 ﻿
-
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container
+//  Services 
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
+//  CORS configuration (allow React dev server)
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowReact",
+        policy =>
+        {
+            policy.WithOrigins("http://localhost:5176") 
+                  .AllowAnyHeader()
+                  .AllowAnyMethod();
+        });
+});
 
 var app = builder.Build();
 
-// Configure middleware
+//  Middleware 
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
@@ -18,6 +28,9 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+
+//  Enable CORS (must be before authorization/endpoints)
+app.UseCors("AllowReact");
 
 app.UseAuthorization();
 
