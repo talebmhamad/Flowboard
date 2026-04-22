@@ -23,8 +23,12 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="DTOs\" />
     <Folder Include="Models\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Flowboard.Application\Flowboard.Application.csproj" />
+    <ProjectReference Include="..\Flowboard.Infrastructure\Flowboard.Infrastructure.csproj" />
   </ItemGroup>
 
 </Project>

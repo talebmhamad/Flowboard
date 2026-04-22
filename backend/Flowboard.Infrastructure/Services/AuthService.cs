@@ -1,0 +1,49 @@
+﻿using Flowboard.Application.Interfaces;
+using Flowboard.Infrastructure.Settings;
+using Microsoft.Extensions.Options;
+using System;
+using System.Collections.Generic;
+using System.Net.Http;
+using System.Text.Json;
+using System.Threading.Tasks;
+
+namespace Flowboard.Infrastructure.Services
+{
+    public class AuthService : IAuthService
+    {
+        private readonly HttpClient _httpClient;
+        private readonly IamSettings _iam;
+
+        public AuthService(HttpClient httpClient, IOptions<IamSettings> iamOptions)
+        {
+            _httpClient = httpClient;
+            _iam = iamOptions.Value;
+        }
+
+        public async Task<string> LoginAsync(string username, string password)
+        {
+            var content = new FormUrlEncodedContent(new[]
+            {
+                new KeyValuePair<string, string>("client_id", _iam.ClientId),
+                new KeyValuePair<string, string>("client_secret", _iam.ClientSecret),
+                new KeyValuePair<string, string>("grant_type", "password"),
+                new KeyValuePair<string, string>("scope", "IdentityServerApi"),
+                new KeyValuePair<string, string>("username", username),
+                new KeyValuePair<string, string>("password", password)
+            });
+
+            var url = $"{_iam.Url}/connect/token";
+
+            var response = await _httpClient.PostAsync(url, content);
+
+            if (!response.IsSuccessStatusCode)
+                throw new Exception("Invalid credentials");
+
+            var json = await response.Content.ReadAsStringAsync();
+            var doc = JsonDocument.Parse(json);
+
+            return doc.RootElement.GetProperty("access_token").GetString();
+        }
+
+    }
+}

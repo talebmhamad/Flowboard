@@ -1,18 +1,24 @@
-﻿
+﻿using Flowboard.Infrastructure.Services;
+using Flowboard.Infrastructure.Settings;
+using Flowboard.Application.Interfaces;
+
 var builder = WebApplication.CreateBuilder(args);
 
 //  Services 
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+builder.Services.Configure<IamSettings>(
+    builder.Configuration.GetSection("IAM"));
 
-//  CORS configuration (allow React dev server)
+builder.Services.AddHttpClient<IAuthService, AuthService>();
+
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowReact",
         policy =>
         {
-            policy.WithOrigins("http://localhost:5176") 
+            policy.WithOrigins("http://localhost:5178") 
                   .AllowAnyHeader()
                   .AllowAnyMethod();
         });
