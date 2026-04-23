@@ -46,8 +46,16 @@ builder.Services.AddSwaggerGen(options =>
 builder.Services.Configure<IamSettings>(
     builder.Configuration.GetSection("IAM"));
 
-//  Dependency Injection
-builder.Services.AddHttpClient<IAuthService, AuthService>();
+builder.Services.Configure<PortalSettings>(
+    builder.Configuration.GetSection("Portal"));
+
+builder.Services.AddHttpClient<IUserTaskService, UserTaskService>((sp, client) =>
+{
+    var portalSettings = sp.GetRequiredService<
+        Microsoft.Extensions.Options.IOptions<PortalSettings>>().Value;
+
+    client.BaseAddress = new Uri(portalSettings.BaseUrl);
+});
 
 //  JWT Authentication
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)

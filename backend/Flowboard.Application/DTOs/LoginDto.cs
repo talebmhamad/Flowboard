@@ -1,4 +1,4 @@
-﻿namespace Flowboard.API.DTOs
+﻿namespace Flowboard.Application.DTOs
 {
     public class LoginDto
     {
