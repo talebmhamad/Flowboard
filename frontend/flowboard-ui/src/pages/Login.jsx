@@ -17,11 +17,15 @@ export default function Login() {
 
       const user = jwtDecode(token);
 
-      if (user.role === "Manager") {
+      if (user.role === "Manager")
+      {
         window.location.href = "/manager-dashboard";
-      } else {
+      }
+      else if (user.role === "User") 
+      {
         window.location.href = "/user-dashboard";
       }
+      
     }
 
   };
