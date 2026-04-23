@@ -13,8 +13,10 @@ export default function Dashboard() {
 
   if (!user) return <p>Loading...</p>;
 
+  const role = user.role?.toLowerCase();
+
   const isManager =
-    user.role === "Administrator" || user.role === "Manager";
+    role === "administrator" || role === "manager";
 
   return (
     <div>

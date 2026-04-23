@@ -67,13 +67,12 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
 //  Authorization
 builder.Services.AddAuthorization();
 
-//  CORS (React frontend)
 builder.Services.AddCors(options =>
 {
-    options.AddPolicy("AllowReact",
+    options.AddPolicy("AllowAll",
         policy =>
         {
-            policy.WithOrigins("http://localhost:5182") 
+            policy.AllowAnyOrigin()
                   .AllowAnyHeader()
                   .AllowAnyMethod();
         });
@@ -91,7 +90,7 @@ if (app.Environment.IsDevelopment())
 app.UseHttpsRedirection();
 
 //  Enable CORS
-app.UseCors("AllowReact");
+app.UseCors("AllowAll");
 
 app.UseAuthentication(); 
 app.UseAuthorization();

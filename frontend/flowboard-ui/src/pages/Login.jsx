@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useAuth } from "../hooks/useAuth";
 import { Eye, EyeOff, Lock, User } from "lucide-react"; 
 import { useNavigate } from "react-router-dom";
+import { getUserFromToken } from "../utils/authUser";
 
 export default function Login() {
   const { loginUser, loading, error } = useAuth();
@@ -14,23 +15,9 @@ export default function Login() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
     const success = await loginUser(username, password);
-
     if (success) {
-      const token = localStorage.getItem("token");
-
-      const user = jwtDecode(token);
-
-      if (user.role === "Manager")
-      {
-        window.location.href = "/manager-dashboard";
-      }
-      else if (user.role === "User") 
-      {
-        window.location.href = "/user-dashboard";
-      }
-      
+     navigate("/dashboard");
     }
   };
 
