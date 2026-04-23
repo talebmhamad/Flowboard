@@ -1,29 +1,25 @@
 import { useState } from "react";
 import { useAuth } from "../hooks/useAuth";
 import { Eye, EyeOff, Lock, User } from "lucide-react"; 
+import { useNavigate } from "react-router-dom";
 
 export default function Login() {
   const { loginUser, loading, error } = useAuth();
+
+  const navigate = useNavigate(); 
+
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
     const success = await loginUser(username, password);
 
     if (success) {
-      const token = localStorage.getItem("token");
-
-      const user = jwtDecode(token);
-
-      if (user.role === "Manager") {
-        window.location.href = "/manager-dashboard";
-      } else {
-        window.location.href = "/user-dashboard";
-      }
+      navigate("/dashboard"); 
     }
-
   };
 
   return (
@@ -34,12 +30,13 @@ export default function Login() {
       >
         <div className="text-center mb-4">
           <h2 className="fw-bold">
-          <span className="text-primary">Flow</span>
-          <span style={{ color: "#6c757d" }}>Board</span> 
+            <span className="text-primary">Flow</span>
+            <span style={{ color: "#6c757d" }}>Board</span> 
           </h2>
         </div>
 
         <form onSubmit={handleSubmit} noValidate>
+          {/* Username */}
           <div className="mb-3">
             <label className="form-label small fw-bold">Username</label>
             <div className="input-group">
@@ -57,6 +54,7 @@ export default function Login() {
             </div>
           </div>
 
+          {/* Password */}
           <div className="mb-4">
             <label className="form-label small fw-bold">Password</label>
             <div className="input-group">
@@ -75,27 +73,24 @@ export default function Login() {
                 type="button"
                 className="input-group-text bg-white border-start-0"
                 onClick={() => setShowPassword(!showPassword)}
-                style={{ cursor: "pointer" }}
               >
                 {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
               </button>
             </div>
           </div>
 
+          {/* Button */}
           <button
             type="submit"
             className="btn btn-primary w-100 py-2 fw-bold shadow-sm"
             disabled={loading}
           >
-            {loading ? (
-              <span className="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
-            ) : null}
             {loading ? "Authenticating..." : "Sign In"}
           </button>
         </form>
 
         {error && (
-          <div className="alert alert-danger mt-4 small border-0 text-center" role="alert">
+          <div className="alert alert-danger mt-4 small text-center">
             {error}
           </div>
         )}
