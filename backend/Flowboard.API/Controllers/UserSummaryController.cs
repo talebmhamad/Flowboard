@@ -1,12 +1,10 @@
-﻿using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using Flowboard.Application.Interfaces;
 
 namespace Flowboard.API.Controllers
 {
     [ApiController]
-    [Route("api/user/summary")]
-    [Authorize(Roles = "User")]
+    [Route("api/user")]
     public class UserSummaryController : ControllerBase
     {
         private readonly IUserSummaryService _service;
@@ -16,17 +14,23 @@ namespace Flowboard.API.Controllers
             _service = service;
         }
 
-        [HttpGet]
+        [HttpGet, Route("summary")]
         public async Task<IActionResult> GetSummary()
         {
-            var token = HttpContext.Request.Headers["Authorization"].ToString();
-
-            if (string.IsNullOrEmpty(token))
-                return Unauthorized("Missing token");
-
-            var result = await _service.GetSummary(token);
-
-            return Ok(result);
+            try
+            {
+                var result = await _service.GetSummary();
+                return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new
+                {
+                    message = "An error occurred while fetching summary",
+                    error = ex.Message
+                });
+            }
         }
+
     }
 }

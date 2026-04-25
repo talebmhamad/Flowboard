@@ -2,11 +2,11 @@
 {
    public class UserSummaryDto
     {
-        public int Draft { get; set; }
-        public int Inbox { get; set; }
-        public int Completed { get; set; }
-        public int MyRequests { get; set; }
-        public int Closed { get; set; }
+        public CountDto Draft { get; set; }
+        public CountDto Inbox { get; set; }
+        public CountDto Completed { get; set; }
+        public CountDto MyRequests { get; set; }
+        public CountDto Closed { get; set; }
     }
 
 }

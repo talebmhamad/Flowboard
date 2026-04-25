@@ -1,0 +1,90 @@
+/* Layout Container */
+.dashboard-wrapper {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  background-color: #f9fafb; /* Light gray background for the whole page */
+}
+
+/* Header & Tabs at Top */
+.dashboard-header {
+  background: #ffffff;
+  padding: 0 24px;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.dashboard-tabs {
+  display: flex;
+  gap: 32px; /* More space between tabs */
+}
+
+.dashboard-tab {
+  padding: 16px 4px;
+  border: none;
+  background: none;
+  color: #6b7280;
+  cursor: pointer;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  border-bottom: 2px solid transparent;
+  transition: all 0.2s ease;
+}
+
+.dashboard-tab.active {
+  border-bottom: 2px solid #52a187;
+  color: #52a187;
+}
+
+/* Badges */
+.counts {
+  display: flex;
+  gap: 4px;
+}
+
+.count-badge {
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-size: 11px;
+  font-weight: 600;
+  color: #fff;
+}
+
+.count-badge.today { background: #bc5a91; }
+.count-badge.total { background: #74c365; }
+
+/* Content Area */
+.dashboard-main-content {
+  padding: 24px;
+  flex: 1;
+}
+
+.dashboard-card {
+  background: #ffffff;
+  padding: 32px;
+  border-radius: 12px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+  min-height: 400px;
+}
+
+.dashboard-title {
+  font-size: 20px;
+  font-weight: 600;
+  color: #111827;
+  margin-bottom: 24px;
+}
+
+.dashboard-empty {
+  margin-top: 40px;
+  padding: 60px;
+  text-align: center;
+  border: 2px dashed #e5e7eb;
+  border-radius: 12px;
+  color: #9ca3af;
+}
+
+.empty-icon {
+  font-size: 48px;
+  margin-bottom: 16px;
+}

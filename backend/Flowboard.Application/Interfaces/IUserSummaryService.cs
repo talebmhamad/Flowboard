@@ -5,6 +5,7 @@ namespace Flowboard.Application.Interfaces
 {
     public interface IUserSummaryService
     {
-        Task<UserSummaryDto> GetSummary(string token);
+        Task<UserSummaryDto> GetSummary();
+
     }
 }

@@ -12,7 +12,7 @@ export const useAuth = () => {
 
       const data = await authService.login(username, password);
 
-      localStorage.setItem("token", data.token);
+      sessionStorage.setItem("token", data.token);
 
       return true;
     } catch (err) {

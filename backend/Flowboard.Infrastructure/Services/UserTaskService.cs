@@ -1,5 +1,4 @@
 ﻿using System.Net.Http;
-using System.Net.Http.Headers;
 using System.Text;
 using System.Threading.Tasks;
 using Flowboard.Application.Interfaces;
@@ -15,46 +14,32 @@ namespace Flowboard.Infrastructure.Services
             _http = http;
         }
 
-        private void SetToken(string token)
+        public async Task<string> GetActiveTasks()
         {
-            _http.DefaultRequestHeaders.Authorization =
-                new AuthenticationHeaderValue("Bearer", token.Replace("Bearer ", ""));
-        }
-
-        public async Task<object> GetActiveTasks(string token)
-        {
-            SetToken(token);
-
             var response = await _http.PostAsync("Task/ListInbox",
                 new StringContent("{}", Encoding.UTF8, "application/json"));
 
             return await response.Content.ReadAsStringAsync();
         }
 
-        public async Task<object> GetCompletedTasks(string token)
+        public async Task<string> GetCompletedTasks()
         {
-            SetToken(token);
-
             var response = await _http.PostAsync("Task/ListCompleted",
                 new StringContent("{}", Encoding.UTF8, "application/json"));
 
             return await response.Content.ReadAsStringAsync();
         }
 
-        public async Task<object> GetDraftTasks(string token)
+        public async Task<string> GetDraftTasks()
         {
-            SetToken(token);
-
             var response = await _http.PostAsync("Document/ListDraft",
                 new StringContent("{}", Encoding.UTF8, "application/json"));
 
             return await response.Content.ReadAsStringAsync();
         }
 
-        public async Task<object> GetMyRequests(string token)
+        public async Task<string> GetMyRequests()
         {
-            SetToken(token);
-
             var response = await _http.PostAsync("Document/ListMyRequests",
                 new StringContent("{}", Encoding.UTF8, "application/json"));
 

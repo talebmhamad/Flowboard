@@ -1,7 +1,7 @@
 ﻿using Flowboard.Application.DTOs;
 using Flowboard.Application.Interfaces;
 using System.Net.Http;
-using System.Net.Http.Headers;
+using System.Text.Json;
 using System.Threading.Tasks;
 
 namespace Flowboard.Infrastructure.Services
@@ -15,31 +15,34 @@ namespace Flowboard.Infrastructure.Services
             _http = http;
         }
 
-        public async Task<UserSummaryDto> GetSummary(string token)
+        public async Task<UserSummaryDto> GetSummary()
         {
-            _http.DefaultRequestHeaders.Authorization =
-                new AuthenticationHeaderValue("Bearer", token.Replace("Bearer ", ""));
-
             return new UserSummaryDto
             {
-                Draft = await GetCount("Task/GetDraftCounts?nodeId=1"),
+                Draft = await GetCount("Document/GetDraftCounts?nodeId=1"),
                 Inbox = await GetCount("Task/GetInboxCounts?nodeId=2"),
                 Completed = await GetCount("Task/GetCompletedCounts?nodeId=3"),
-                MyRequests = await GetCount("Task/GetMyRequestsCounts?nodeId=4"),
-                Closed = await GetCount("Task/GetClosedCounts?nodeId=6")
+                MyRequests = await GetCount("Document/GetMyRequestsCounts?nodeId=4"),
+                Closed = await GetCount("Document/GetClosedCounts?nodeId=6")
             };
         }
 
-        private async Task<int> GetCount(string url)
+        private async Task<CountDto> GetCount(string url)
         {
             var response = await _http.GetAsync(url);
 
             if (!response.IsSuccessStatusCode)
-                return 0;
+                return new CountDto();
 
-            var result = await response.Content.ReadAsStringAsync();
+            var json = await response.Content.ReadAsStringAsync();
 
-            return int.TryParse(result, out int value) ? value : 0;
+            var data = JsonSerializer.Deserialize<CountDto>(json, new JsonSerializerOptions
+            {
+                PropertyNameCaseInsensitive = true
+            });
+
+            return data ?? new CountDto();
         }
+
     }
 }

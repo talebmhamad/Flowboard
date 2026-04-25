@@ -1,5 +1,7 @@
+import { getToken, logout } from "./authStorage";
+
 export const apiFetch = async (url, options = {}) => {
-  const token = localStorage.getItem("token");
+  const token = getToken();
 
   const headers = {
     "Content-Type": "application/json",
@@ -13,7 +15,8 @@ export const apiFetch = async (url, options = {}) => {
   });
 
   if (!response.ok) {
-    throw new Error("API request failed");
+    const errorText = await response.text();
+    throw new Error(errorText || "API request failed");
   }
 
   return response.json();

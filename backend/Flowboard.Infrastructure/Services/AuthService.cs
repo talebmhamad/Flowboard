@@ -32,18 +32,38 @@ namespace Flowboard.Infrastructure.Services
                 new KeyValuePair<string, string>("password", password)
             });
 
-            var url = $"{_iam.Url}/connect/token";
+            var url = _iam.Url.TrimEnd('/') + "/connect/token";
 
             var response = await _httpClient.PostAsync(url, content);
 
             if (!response.IsSuccessStatusCode)
-                throw new Exception("Invalid credentials");
+            {
+                var error = await response.Content.ReadAsStringAsync();
+                throw new UnauthorizedAccessException("Login failed: " + error);
+            }
 
             var json = await response.Content.ReadAsStringAsync();
+
             var doc = JsonDocument.Parse(json);
 
-            return doc.RootElement.GetProperty("access_token").GetString();
-        }
+            try
+            {
+                JsonElement tokenElement;
 
+                if (!doc.RootElement.TryGetProperty("access_token", out tokenElement))
+                    throw new Exception("Token not found in response");
+
+                var token = tokenElement.GetString();
+
+                if (string.IsNullOrEmpty(token))
+                    throw new Exception("Token is empty");
+
+                return token;
+            }
+            finally
+            {
+                doc.Dispose();
+            }
+        }
     }
 }
