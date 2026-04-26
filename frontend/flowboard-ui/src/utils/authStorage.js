@@ -1,4 +1,5 @@
 
 
-export const getToken = () => localStorage.getItem("token");
-export const logout = () => localStorage.removeItem("token");
+export const getToken = () => sessionStorage.getItem("token");
+
+export const logout = () => sessionStorage.removeItem("token");

@@ -1,10 +1,10 @@
 
+import DashboardLayout from "../../layouts/DashboardLayout";
 
 export default function ManagerDashboard() {
   return (
-    <div>
-      <h2>Manager Dashboard 👑</h2>
-      <p>View all cases, filters, reports...</p>
-    </div>
+    <DashboardLayout>
+      <h2>Manager Dashboard</h2>
+    </DashboardLayout>
   );
 }

@@ -1,0 +1,79 @@
+.sidebar {
+  width: 280px;
+  background: #ffffff;
+  border-right: 1px solid #f0f0f0;
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  font-family: 'Inter', -apple-system, sans-serif;
+}
+
+.sidebar-content {
+  padding: 24px 16px;
+  flex: 1;
+  overflow-y: auto;
+}
+
+.sidebar-title {
+  color: #9ca3af; /* Soft gray */
+  font-size: 11px;
+  letter-spacing: 0.05em;
+  margin-bottom: 16px;
+  padding-left: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+.sidebar-nav {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.nav-item {
+  display: flex;
+  align-items: center;
+  padding: 12px 12px;
+  border-radius: 8px;
+  cursor: pointer;
+  color: #4b5563;
+  transition: all 0.2s ease;
+}
+
+/* Hover effect */
+.nav-item:hover {
+  background: #f9fafb;
+  color: #111827;
+}
+
+/* Active state (matches the soft pink/purple in your screenshot) */
+.nav-item.active {
+  background: #fdf2f8; 
+  color: #be185d;
+  font-weight: 600;
+}
+
+.label {
+  flex: 1;
+  font-size: 14px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.logout-btn {
+  margin: 16px;
+  padding: 12px;
+  background: #fff;
+  color: #dc2626;
+  border: 1px solid #fee2e2;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 14px;
+  transition: background 0.2s;
+}
+
+.logout-btn:hover {
+  background: #fef2f2;
+}

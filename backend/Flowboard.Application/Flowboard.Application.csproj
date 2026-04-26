@@ -41,8 +41,14 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="DTOs\CountDto.cs" />
+    <Compile Include="DTOs\WorkflowDto.cs" />
+    <Compile Include="DTOs\LoginDto.cs" />
+    <Compile Include="DTOs\UserSummaryDto.cs" />
     <Compile Include="Interfaces\IAuthService.cs" />
-    <Compile Include="Interfaces\IUserCaseService.cs" />
+    <Compile Include="Interfaces\IUserTaskService.cs" />
+    <Compile Include="Interfaces\IUserSummaryService.cs" />
+    <Compile Include="Interfaces\IWorkflowService.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
