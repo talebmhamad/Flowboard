@@ -2,12 +2,15 @@ import DashboardLayout from "../../layouts/DashboardLayout";
 import { useState, useEffect } from "react";
 import { getUserFromToken } from "../../utils/authUser";
 import { getUserSummary } from "../../services/userService";
+import WorkflowFormContent from "../../components/WorkflowFormContent";
 import "../../styles/userDashboard.css";
+import InboxTable from "../../components/InboxTable";
 
 export default function UserDashboard() {
   const [activeTab, setActiveTab] = useState("inbox");
   const [user, setUser] = useState(null);
   const [summary, setSummary] = useState(null);
+  const [selectedWorkflow, setSelectedWorkflow] = useState(null);
 
   useEffect(() => {
     const currentUser = getUserFromToken();
@@ -21,60 +24,55 @@ export default function UserDashboard() {
         console.error("Summary error:", err);
       }
     };
+
     fetchSummary();
   }, []);
 
-  const getCounts = (key) => ({
-    today: summary?.[key]?.today ?? 0,
-    total: summary?.[key]?.total ?? 0
-  });
-
-  const menu = [
-    { key: "inbox", label: "Inbox" },
-    { key: "completed", label: "Completed" },
-    { key: "draft", label: "Draft" }
-  ];
-
   return (
-    <DashboardLayout user={user}>
-      <div className="dashboard-wrapper">
-        
-        {/* TOP NAVIGATION BAR */}
-        <header className="dashboard-header">
-          <div className="dashboard-tabs">
-            {menu.map((item) => {
-              const counts = getCounts(item.key);
-              return (
-                <button
-                  key={item.key}
-                  onClick={() => setActiveTab(item.key)}
-                  className={`dashboard-tab ${activeTab === item.key ? "active" : ""}`}
-                >
-                  <span className="tab-label">{item.label}</span>
-                  <div className="counts">
-                    <span className="count-badge today">{counts.today}</span>
-                    <span className="count-badge total">{counts.total}</span>
-                  </div>
-                </button>
-              );
-            })}
-          </div>
-        </header>
+    <DashboardLayout
+      user={user}
+      activeTab={activeTab}
+      setActiveTab={setActiveTab}
+      summary={summary}
+      onSelectWorkflow={setSelectedWorkflow}
+    >
 
-        {/* MAIN CONTENT AREA */}
-        <main className="dashboard-main-content">
-          <div className="dashboard-card">
-            <h2 className="dashboard-title">
-              {activeTab.charAt(0).toUpperCase() + activeTab.slice(1)} Items
-            </h2>
+      {/* ✅ SWITCH CONTENT */}
+      {selectedWorkflow ? (
+        <WorkflowFormContent
+          data={selectedWorkflow}
+          onBack={() => setSelectedWorkflow(null)}
+        />
+      ) : (
+        <DefaultDashboardContent activeTab={activeTab} />
+      )}
 
-            <div className="dashboard-empty">
-              <div className="empty-icon">📂</div>
-              <p>No {activeTab} tasks found for the selected workflow.</p>
-            </div>
-          </div>
-        </main>
-      </div>
     </DashboardLayout>
   );
+}
+
+function DefaultDashboardContent({ activeTab }) {
+  switch (activeTab) {
+    case "inbox":
+      return <InboxTable />;
+
+    case "completed":
+      return (
+        <div className="dashboard-card">
+          <h2 className="dashboard-title">Completed Items</h2>
+          <p>No completed tasks yet.</p>
+        </div>
+      );
+
+    case "draft":
+      return (
+        <div className="dashboard-card">
+          <h2 className="dashboard-title">Draft Items</h2>
+          <p>No draft tasks yet.</p>
+        </div>
+      );
+
+    default:
+      return null;
+  }
 }

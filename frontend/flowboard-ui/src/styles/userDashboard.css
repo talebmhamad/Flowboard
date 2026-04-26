@@ -1,25 +1,24 @@
-/* Layout Container */
-.dashboard-wrapper {
+/* Container for the whole top bar */
+.layout-header {
   display: flex;
-  flex-direction: column;
-  height: 100%;
-  background-color: #f9fafb; /* Light gray background for the whole page */
-}
-
-/* Header & Tabs at Top */
-.dashboard-header {
+  justify-content: space-between; /* Tabs on left, User on right */
+  align-items: center;
   background: #ffffff;
   padding: 0 24px;
   border-bottom: 1px solid #e5e7eb;
+  height: 64px; /* Fixed height for a consistent look */
 }
 
+/* Tabs container inside the header */
 .dashboard-tabs {
   display: flex;
-  gap: 32px; /* More space between tabs */
+  gap: 32px;
+  height: 100%; /* Make buttons fill the header height */
 }
 
 .dashboard-tab {
-  padding: 16px 4px;
+  height: 100%;
+  padding: 0 4px;
   border: none;
   background: none;
   color: #6b7280;
@@ -28,63 +27,26 @@
   display: flex;
   align-items: center;
   gap: 10px;
-  border-bottom: 2px solid transparent;
+  border-bottom: 3px solid transparent; /* Slightly thicker for better visibility */
   transition: all 0.2s ease;
 }
 
 .dashboard-tab.active {
-  border-bottom: 2px solid #52a187;
+  border-bottom: 3px solid #52a187;
   color: #52a187;
 }
 
-/* Badges */
-.counts {
+/* Right side of header (User + Lock) */
+.header-right-section {
   display: flex;
-  gap: 4px;
+  align-items: center;
+  gap: 20px;
 }
 
-.count-badge {
-  padding: 2px 8px;
-  border-radius: 4px;
-  font-size: 11px;
-  font-weight: 600;
-  color: #fff;
-}
-
-.count-badge.today { background: #bc5a91; }
-.count-badge.total { background: #74c365; }
-
-/* Content Area */
-.dashboard-main-content {
-  padding: 24px;
-  flex: 1;
-}
-
-.dashboard-card {
-  background: #ffffff;
-  padding: 32px;
-  border-radius: 12px;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
-  min-height: 400px;
-}
-
-.dashboard-title {
-  font-size: 20px;
-  font-weight: 600;
-  color: #111827;
-  margin-bottom: 24px;
-}
-
-.dashboard-empty {
-  margin-top: 40px;
-  padding: 60px;
-  text-align: center;
-  border: 2px dashed #e5e7eb;
-  border-radius: 12px;
-  color: #9ca3af;
-}
-
-.empty-icon {
-  font-size: 48px;
-  margin-bottom: 16px;
+.header-user {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-weight: 500;
+  color: #374151;
 }

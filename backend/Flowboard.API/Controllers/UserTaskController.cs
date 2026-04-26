@@ -1,10 +1,8 @@
 ﻿using Flowboard.Application.Interfaces;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 [ApiController]
 [Route("api/[controller]")]
-[Authorize(Roles = "User")]
 public class TasksController : ControllerBase
 {
     private readonly IUserTaskService _service;

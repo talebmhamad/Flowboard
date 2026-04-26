@@ -25,10 +25,6 @@ namespace Flowboard.Infrastructure.Services
 
             var content = await response.Content.ReadAsStringAsync();
 
-            // 🔥 Debug (remove later)
-            Console.WriteLine("Workflow Response:");
-            Console.WriteLine(content);
-
             if (!response.IsSuccessStatusCode)
                 throw new Exception($"Portal API Error: {response.StatusCode} - {content}");
 
@@ -41,6 +37,23 @@ namespace Flowboard.Infrastructure.Services
             });
 
             return data ?? new List<WorkflowDto>();
+        }
+
+        public async Task<string> GetWorkflowFormAsync(int documentTypeId)
+        {
+            var url = $"Document/GetForm?documentTypeId={documentTypeId}";
+
+            var response = await _http.GetAsync(url);
+
+            var content = await response.Content.ReadAsStringAsync();
+
+            if (!response.IsSuccessStatusCode)
+                throw new Exception($"Portal API Error: {response.StatusCode} - {content}");
+
+            if (string.IsNullOrWhiteSpace(content))
+                return "{}";
+
+            return content; 
         }
     }
 

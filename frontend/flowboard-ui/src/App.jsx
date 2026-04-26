@@ -1,23 +1,31 @@
-import { Routes, Route } from "react-router-dom";
+import { Routes, Route, Navigate } from "react-router-dom";
+
 import Login from "./pages/Login";
-import Dashboard from "./pages/dashboard/Dashboard";
 import ProtectedRoute from "./components/ProtectedRoute";
+
+import UserDashboard from "./pages/dashboard/UserDashboard";
 
 function App() {
   return (
     <Routes>
+
+      {/* PUBLIC */}
       <Route path="/login" element={<Login />} />
 
+      {/* PROTECTED */}
       <Route
         path="/dashboard"
         element={
           <ProtectedRoute>
-            <Dashboard />
+            <UserDashboard />
           </ProtectedRoute>
         }
       />
 
-      <Route path="*" element={<Login />} />
+      {/* DEFAULT */}
+      <Route path="/" element={<Navigate to="/dashboard" />} />
+      <Route path="*" element={<Navigate to="/dashboard" />} />
+
     </Routes>
   );
 }

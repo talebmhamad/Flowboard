@@ -1,18 +1,15 @@
 import { useEffect, useState } from "react";
-import { getWorkflows } from "../services/workflowService";
-import { useNavigate, useLocation } from "react-router-dom";
+import { getWorkflows, getWorkflowForm } from "../services/workflowService";
 import { logout } from "../utils/authStorage";
 import "../styles/sidebar.css";
 
-export default function Sidebar() {
+export default function Sidebar({ onSelectWorkflow }) {
   const [workflows, setWorkflows] = useState([]);
   const [activeId, setActiveId] = useState(null);
-  const navigate = useNavigate();
-  const location = useLocation();
 
   const handleLogout = () => {
-    logout(); 
-    navigate("/login");
+    logout();
+    window.location.href = "/login";
   };
 
   useEffect(() => {
@@ -21,30 +18,50 @@ export default function Sidebar() {
         const data = await getWorkflows();
         setWorkflows(data);
       } catch (err) {
-        console.error(err);
+        console.error("Error loading workflows:", err);
       }
     };
+
     fetchWorkflows();
   }, []);
+
+  const handleWorkflowClick = async (wf) => {
+    try {
+      setActiveId(wf.id);
+
+      const formData = await getWorkflowForm(wf.id);
+
+      onSelectWorkflow({
+        form: formData,
+        workflow: wf
+      });
+
+    } catch (err) {
+      console.error("Error loading workflow form:", err);
+    }
+  };
 
   return (
     <aside className="sidebar">
       <div className="sidebar-content">
         <h2 className="sidebar-title">WORKFLOWS</h2>
+
         <nav className="sidebar-nav">
           {workflows.map((wf) => (
-            <div 
-              key={wf.id} 
-              className={`nav-item ${activeId === wf.id ? 'active' : ''}`}
-              onClick={() => setActiveId(wf.id)}
+            <div
+              key={wf.id}
+              className={`nav-item ${activeId === wf.id ? "active" : ""}`}
+              onClick={() => handleWorkflowClick(wf)}
             >
               <span className="label">{wf.text || wf.name}</span>
             </div>
           ))}
         </nav>
       </div>
-      
-      <button onClick={handleLogout} className="logout-btn">Log Out</button>
+
+      <button onClick={handleLogout} className="logout-btn">
+        Log Out
+      </button>
     </aside>
   );
 }

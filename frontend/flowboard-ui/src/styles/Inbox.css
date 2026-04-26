@@ -1,0 +1,80 @@
+.inbox-card {
+  background: white;
+  border-radius: 12px;
+  border: 1px solid #e2e8f0;
+  overflow: hidden; /* Keeps the border-radius clean */
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+}
+
+.custom-table {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: left;
+  font-size: 0.875rem;
+}
+
+.custom-table th {
+  background-color: #f8fafc;
+  color: #64748b;
+  font-weight: 600;
+  padding: 12px 16px;
+  border-bottom: 1px solid #e2e8f0;
+  text-transform: none;
+}
+
+.custom-table td {
+  padding: 14px 16px;
+  border-bottom: 1px solid #f1f5f9;
+  color: #1e293b;
+}
+
+.custom-table tr:hover {
+  background-color: #fbfcfd;
+}
+
+/* Status Badges */
+.status-badge {
+  padding: 4px 10px;
+  border-radius: 6px;
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+
+.status-badge.pending {
+  background-color: #5cb85c; /* Based on your screenshot green */
+  color: white;
+}
+
+.status-badge.for-approval {
+  background-color: #5cb85c;
+  color: white;
+}
+
+/* Action Buttons */
+.actions-cell {
+  display: flex;
+  gap: 8px;
+  justify-content: flex-end;
+}
+
+.action-btn {
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  padding: 4px;
+  border-radius: 4px;
+  transition: background 0.2s;
+}
+
+.action-btn.edit {
+  background-color: #5aa382; /* Professional Teal */
+  color: white;
+}
+
+.action-btn.edit:hover {
+  background-color: #4a8a6d;
+}
+
+.font-medium {
+  font-weight: 500;
+}
