@@ -1,113 +1,77 @@
 :root {
-  --primary-color: #2563eb;    /* Modern Blue */
-  --secondary-color: #64748b;  /* Slate */
-  --success-color: #059669;    /* Emerald */
-  --action-color: #7c3aed;     /* Violet */
-  --bg-subtle: #f8fafc;
-  --text-main: #1e293b;
-  --text-muted: #64748b;
+  --bg-page: #f8fafc;
   --border-color: #e2e8f0;
-  --shadow-sm: 0 1px 3px 0 rgb(0 0 0 / 0.1);
-  --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+  --text-muted: #475569;
+  
+  --btn-save-bg: #22c55e;    /* Clean Emerald Green */
+  --btn-send-bg: #3b82f6;    /* Standard Modern Blue */
+  --btn-hover-opacity: 0.9;
 }
 
 .workflow-container {
-  padding: 0rem 0rem;
-  max-width: 900px;
-  margin: 0 auto;
-  font-family: 'Inter', -apple-system, sans-serif;
-  color: var(--text-main);
+  background-color: var(--bg-page);
+  min-height: 100vh;
+  padding: 30px;
+  font-family: 'Inter', sans-serif;
 }
 
-/* Header Refinement */
-.workflow-header-row {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  border-bottom: 1px solid var(--border-color);
-  padding-bottom: 1.5rem;
-  margin-bottom: 2rem;
-}
-
-.form-title {
-  font-size: 1.75rem;
-  font-weight: 800;
-  letter-spacing: -0.025em;
-  color: var(--text-main);
-  margin: 0;
-}
-
-/* The Main Card */
 .workflow-card {
   background: #ffffff;
   border: 1px solid var(--border-color);
-  border-radius: 16px;
-  box-shadow: var(--shadow-md);
+  border-radius: 12px;
   padding: 32px;
-  transition: box-shadow 0.3s ease;
+  box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1);
 }
 
-.workflow-card:hover {
-  box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.05);
+.form-title {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: #1e293b;
+  margin-bottom: 24px;
 }
 
-/* Button Grouping */
-.workflow-actions {
-  display: flex;
-  justify-content: flex-end;
+.form-internal-actions {
   margin-top: 2rem;
-  gap: 12px;
   padding-top: 1.5rem;
   border-top: 1px solid var(--border-color);
 }
 
-/* Buttons Styling */
-.btn-save, .btn-send, .btn-back {
-  font-size: 0.875rem;
-  font-weight: 600;
-  padding: 10px 20px;
-  border-radius: 8px;
+.btn-inside-save button, 
+.btn-inside-send button {
+  padding: 10px 24px !important;
+  font-size: 0.875rem !important;
+  font-weight: 600 !important;
+  border-radius: 8px !important;
+  border: none !important;
+  color: #ffffff !important;
   cursor: pointer;
-  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-  border: 1px solid transparent;
+  transition: all 0.2s ease !important;
+  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05) !important;
 }
 
-.btn-save {
-  background-color: white;
-  border: 1px solid var(--border-color);
-  color: var(--text-main);
+.btn-inside-save button {
+  background-color: var(--btn-save-bg) !important;
 }
 
-.btn-save:hover {
-  background-color: var(--bg-subtle);
-  border-color: #cbd5e1;
+.btn-inside-send button {
+  background-color: var(--btn-send-bg) !important;
 }
 
-.btn-send {
-  background-color: var(--primary-color);
-  color: white;
-  box-shadow: 0 2px 4px rgba(37, 99, 235, 0.2);
-}
-
-.btn-send:hover {
-  background-color: #1d4ed8;
+.btn-inside-save button:hover, 
+.btn-inside-send button:hover {
+  filter: brightness(1.05);
   transform: translateY(-1px);
-  box-shadow: 0 4px 6px rgba(37, 99, 235, 0.3);
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1) !important;
 }
 
-/* Form.io Overrides for Professionalism */
-.formio-form {
-  margin-top: 0;
+.btn-inside-save button:active, 
+.btn-inside-send button:active {
+  transform: translateY(0);
 }
 
-/* Make inputs feel more modern */
 .form-control {
-  border-radius: 6px !important;
   border: 1px solid var(--border-color) !important;
-  padding: 0.6rem 0.75rem !important;
-}
-
-.form-control:focus {
-  border-color: var(--primary-color) !important;
-  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1) !important;
+  border-radius: 8px !important;
+  padding: 0.6rem 0.8rem !important;
+  color: #1e293b !important;
 }

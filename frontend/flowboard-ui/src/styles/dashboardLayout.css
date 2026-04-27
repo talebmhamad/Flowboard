@@ -1,79 +1,157 @@
+/* Variables for consistency */
+:root {
+  --bg-main: #f8fafc;
+  --bg-sidebar: #111827;
+  --header-height: 70px;
+  --border-color: #eef2f6;
+  --text-dark: #1e293b;
+  --text-muted: #64748b;
+  --accent-blue: #38bdf8;
+}
+
 .layout {
   display: flex;
   height: 100vh;
-  background-color: #f4f7f6;
-  font-family: sans-serif;
+  background-color: var(--bg-main);
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
 }
 
 .layout-content {
   flex: 1;
   display: flex;
   flex-direction: column;
+  overflow: hidden;
 }
 
-/* Header */
+/* Header Section */
 .layout-header {
-  height: 55px;
-  background-color: #52a187;
+  height: var(--header-height);
+  background-color: #ffffff;
   display: flex;
   align-items: center;
-  justify-content: flex-end;
-  padding: 0 25px;
-  color: white;
+  justify-content: space-between;
+  padding: 0 30px;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.header-left {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+
+.breadcrumb-icon {
+  font-size: 1.3rem;
+  color: var(--text-muted);
+}
+
+.header-title-group .page-title {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--text-dark);
+  margin: 0;
+  text-transform: capitalize;
+}
+
+.header-title-group .page-subtitle {
+  font-size: 0.75rem;
+  color: #94a3b8;
+  margin: 0;
+}
+
+/* Header Right Actions */
+.header-right {
+  display: flex;
+  align-items: center;
   gap: 20px;
 }
 
-.header-icon {
-  cursor: pointer;
-}
-
-.header-user {
+.search-bar {
+  background: #f1f5f9;
+  padding: 8px 16px;
+  border-radius: 20px;
   display: flex;
   align-items: center;
-  gap: 8px;
-  font-size: 15px;
+  gap: 10px;
 }
 
-/* Main content */
+.search-bar i {
+  color: var(--text-muted);
+  font-size: 0.9rem;
+}
+
+.search-bar input {
+  border: none;
+  background: transparent;
+  outline: none;
+  font-size: 0.85rem;
+  width: 180px;
+}
+
+.action-icon {
+  font-size: 1.2rem;
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: color 0.2s;
+}
+
+.action-icon:hover {
+  color: var(--accent-blue);
+}
+
+/* User Pill Component */
+.user-pill {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: #ffffff;
+  padding: 6px 12px 6px 18px;
+  border-radius: 50px;
+  border: 1px solid var(--border-color);
+  box-shadow: 0 2px 4px rgba(0,0,0,0.02);
+}
+
+.user-name {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--text-dark);
+}
+
+.user-avatar-small {
+  width: 32px;
+  height: 32px;
+  background: #1e293b;
+  color: var(--accent-blue);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.85rem;
+  font-weight: bold;
+}
+
+/* Logout Button inside Pill */
+.logout-pill-btn {
+  background: transparent;
+  border: none;
+  padding: 4px;
+  margin-left: 4px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  color: var(--text-dark);
+  font-size: 1.2rem;
+  transition: all 0.2s ease;
+}
+
+.logout-pill-btn:hover {
+  color: #ef4444;
+  transform: translateX(2px);
+}
+
+/* Main Area */
 .layout-main {
   flex: 1;
-  padding: 25px;
+  padding: 30px;
   overflow-y: auto;
 }
-
-
-
-.counts {
-  display: flex;
-  gap: 6px; /* Space between the two numbers */
-  margin-left: 8px; /* Space between "Inbox" and the numbers */
-  align-items: center;
-}
-
-.count-badge {
-  font-family: 'Inter', sans-serif; /* Or your preferred UI font */
-  font-size: 14px;
-  font-weight: 500;
-  padding: 2px 4px;
-  border-radius: 4px;
-  transition: opacity 0.2s ease;
-}
-
-.count-badge.today {
-  background-color: #bc5a91; /* Your specific Pink/Purple */
-  color: #ffffff;
-  min-width: 18px;
-  text-align: center;
-}
-
-.count-badge.total {
-  background-color: #74c365; /* Your specific Green */
-  color: #ffffff;
-  min-width: 18px;
-  text-align: center;
-}
-
-.dashboard-tab:not(.active) .count-badge {
-  opacity: 0.7;
-}
-

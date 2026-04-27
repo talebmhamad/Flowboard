@@ -1,5 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using Flowboard.Application.Interfaces;
+﻿using Flowboard.Application.Interfaces;
+using Microsoft.AspNetCore.Mvc;
 
 namespace Flowboard.API.Controllers;
 

@@ -1,5 +1,6 @@
 ﻿using Flowboard.Application.DTOs;
 using Flowboard.Application.Interfaces;
+using Microsoft.AspNetCore.Http;
 using System;
 using System.Collections.Generic;
 using System.Net.Http;
@@ -11,7 +12,6 @@ namespace Flowboard.Infrastructure.Services
     public class WorkflowService : IWorkflowService
     {
         private readonly HttpClient _http;
-
         public WorkflowService(HttpClient http)
         {
             _http = http;
@@ -19,7 +19,7 @@ namespace Flowboard.Infrastructure.Services
 
         public async Task<List<WorkflowDto>> GetWorkflowsAsync()
         {
-            var url = "DocumentType/ListDocumentTypes?delegationId=null";
+            var url = $"DocumentType/ListByUser?delegationId=Null";
 
             var response = await _http.GetAsync(url);
 
@@ -55,6 +55,7 @@ namespace Flowboard.Infrastructure.Services
 
             return content; 
         }
+
     }
 
 }

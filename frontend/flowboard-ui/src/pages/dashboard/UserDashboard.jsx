@@ -2,64 +2,120 @@ import DashboardLayout from "../../layouts/DashboardLayout";
 import { useState, useEffect } from "react";
 import { getUserFromToken } from "../../utils/authUser";
 import { getUserSummary } from "../../services/userService";
+import { getWorkflows, getWorkflowForm } from "../../services/workflowService";
 import WorkflowFormContent from "../../components/WorkflowFormContent";
-import "../../styles/userDashboard.css";
+import HomeDashboard from "../../components/HomeDashboard";
 import InboxTable from "../../components/InboxTable";
+import "../../styles/userDashboard.css";
 
 export default function UserDashboard() {
-  const [activeTab, setActiveTab] = useState("inbox");
+  const [activeTab, setActiveTab] = useState("home");
   const [user, setUser] = useState(null);
   const [summary, setSummary] = useState(null);
+  const [workflows, setWorkflows] = useState([]);
   const [selectedWorkflow, setSelectedWorkflow] = useState(null);
+  const [loadingForm, setLoadingForm] = useState(false);
 
   useEffect(() => {
     const currentUser = getUserFromToken();
     setUser(currentUser);
 
-    const fetchSummary = async () => {
+    const fetchData = async () => {
       try {
-        const data = await getUserSummary();
-        setSummary(data);
+        const [summaryData, workflowData] = await Promise.all([
+          getUserSummary(),
+          getWorkflows()
+        ]);
+
+        setSummary(summaryData);
+        setWorkflows(workflowData);
       } catch (err) {
-        console.error("Summary error:", err);
+        console.error("Dashboard Data Fetch Error:", err);
       }
     };
 
-    fetchSummary();
+    fetchData();
   }, []);
+
+  const handleSelectWorkflow = async (wf) => {
+    try {
+      setLoadingForm(true);
+
+      const formData = await getWorkflowForm(wf.id);
+
+      setSelectedWorkflow({
+        workflow: wf,
+        form: formData
+      });
+
+      setActiveTab("home"); 
+
+    } catch (err) {
+      console.error("Error loading workflow form:", err);
+    } finally {
+      setLoadingForm(false);
+    }
+  };
+
+  const handleTabChange = (tab) => {
+    setActiveTab(tab);
+    setSelectedWorkflow(null);
+  };
 
   return (
     <DashboardLayout
       user={user}
       activeTab={activeTab}
-      setActiveTab={setActiveTab}
+      setActiveTab={handleTabChange} 
       summary={summary}
-      onSelectWorkflow={setSelectedWorkflow}
+      onSelectWorkflow={handleSelectWorkflow}
     >
-
-      {/* ✅ SWITCH CONTENT */}
-      {selectedWorkflow ? (
+      {loadingForm ? (
+        <div className="dashboard-card">
+          <h2>Loading form...</h2>
+        </div>
+      ) : selectedWorkflow ? (
         <WorkflowFormContent
           data={selectedWorkflow}
           onBack={() => setSelectedWorkflow(null)}
         />
       ) : (
-        <DefaultDashboardContent activeTab={activeTab} />
+        <DefaultDashboardContent
+          activeTab={activeTab}
+          summary={summary}
+          workflows={workflows}
+          onSelectWorkflow={handleSelectWorkflow}
+        />
       )}
-
     </DashboardLayout>
   );
 }
 
-function DefaultDashboardContent({ activeTab }) {
+
+
+function DefaultDashboardContent({
+  activeTab,
+  summary,
+  workflows,
+  onSelectWorkflow
+}) {
   switch (activeTab) {
+    case "home":
+      return (
+        <HomeDashboard
+          summary={summary}
+          workflows={workflows}
+          onSelectWorkflow={onSelectWorkflow}
+        />
+      );
+
     case "inbox":
       return <InboxTable />;
 
     case "completed":
       return (
         <div className="dashboard-card">
-          <h2 className="dashboard-title">Completed Items</h2>
+          <h2>Completed Items</h2>
           <p>No completed tasks yet.</p>
         </div>
       );
@@ -67,7 +123,7 @@ function DefaultDashboardContent({ activeTab }) {
     case "draft":
       return (
         <div className="dashboard-card">
-          <h2 className="dashboard-title">Draft Items</h2>
+          <h2>Draft Items</h2>
           <p>No draft tasks yet.</p>
         </div>
       );

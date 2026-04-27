@@ -29,9 +29,6 @@ namespace Flowboard.Infrastructure.Handlers
                     request.Headers.Remove("Authorization"); // avoid duplicates
 
                     request.Headers.TryAddWithoutValidation("Authorization", token);
-
-                    Console.WriteLine("✅ Token forwarded to Portal:");
-                    Console.WriteLine(token);
                 }
             }
             else
