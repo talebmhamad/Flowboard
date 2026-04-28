@@ -1,22 +1,48 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useCallback } from "react";
 import "../styles/WorkflowForm.css";
+import { useDocument } from "../hooks/useDocument";
 
 export default function WorkflowFormContent({ data, onBack }) {
   const formRef = useRef(null);
   const formInstanceRef = useRef(null);
+  const { save, loading } = useDocument();
+  console.log("WorkflowFormContent data:", data);
 
-  const handleSave = () => {
-    const formData = formInstanceRef.current?.submission?.data || {};
-    console.log("SAVE:", formData);
-    alert("Saved!");
-  };
+  //  SAVE
+  const handleSave = useCallback(async () => {
+    if (loading) return;
 
-  const handleSend = () => {
-    const formData = formInstanceRef.current?.submission?.data || {};
+    try {
+      const formData =
+        formInstanceRef.current?.submission?.data || {};
+
+      console.log("SAVE:", formData);
+
+      await save({
+        documentTypeId: data.workflow.id,
+        workflowId: data.workflow.id,
+        formData,
+        id: data.id || "",
+        rowVersion: data.rowVersion || ""
+      });
+
+      alert("✅ Saved successfully!");
+    } catch (err) {
+      console.error(err);
+      alert("❌ Save failed");
+    }
+  }, [data, save, loading]);
+
+  //  SEND
+  const handleSend = useCallback(() => {
+    const formData =
+      formInstanceRef.current?.submission?.data || {};
+
     console.log("SEND:", formData);
-    alert("Sent!");
-  };
 
+  }, []);
+
+  //  FORM INIT
   useEffect(() => {
     if (!data?.form || !formRef.current) return;
 
@@ -26,17 +52,29 @@ export default function WorkflowFormContent({ data, onBack }) {
       const FormioLib = FormioModule.default || FormioModule;
       const Formio = FormioLib.Formio || FormioLib;
 
-      let formJson =
-        typeof data.form.formDesigner === "string"
-          ? JSON.parse(data.form.formDesigner)
-          : { ...data.form.formDesigner };
+      let formJson = {};
+
+      try {
+        formJson =
+          typeof data.form.formDesigner === "string"
+            ? JSON.parse(data.form.formDesigner)
+            : { ...data.form.formDesigner };
+      } catch (e) {
+        console.error("Invalid form JSON", e);
+        return;
+      }
 
       delete formJson.title;
+
+      if (!formJson.components) {
+        formJson.components = [];
+      }
 
       const hasActions = formJson.components.some(
         (c) => c.customClass === "form-internal-actions"
       );
 
+      //  ADD BUTTONS IF NOT EXISTS
       if (!hasActions) {
         formJson.components.push({
           type: "columns",
@@ -50,12 +88,13 @@ export default function WorkflowFormContent({ data, onBack }) {
                   type: "button",
                   label: "Save",
                   key: "internalSave",
-                  action: "custom",
+                  action: "event",          
+                  event: "internalSave",   
                   theme: "success",
                   customClass: "btn-inside-save",
-                  input: true,
-                },
-              ],
+                  input: true
+                }
+              ]
             },
             {
               width: 2,
@@ -64,18 +103,19 @@ export default function WorkflowFormContent({ data, onBack }) {
                   type: "button",
                   label: "Send",
                   key: "internalSend",
-                  action: "custom",
+                  action: "event",          
+                  event: "internalSend",    
                   theme: "primary",
                   customClass: "btn-inside-send",
-                  input: true,
-                },
-              ],
-            },
-          ],
+                  input: true
+                }
+              ]
+            }
+          ]
         });
       }
 
-      if (formRef.current) formRef.current.innerHTML = "";
+      formRef.current.innerHTML = "";
 
       Formio.createForm(formRef.current, formJson)
         .then((formInstance) => {
@@ -83,8 +123,13 @@ export default function WorkflowFormContent({ data, onBack }) {
           formInstanceRef.current = formInstance;
 
           formInstance.on("customEvent", (event) => {
-            if (event.component.key === "internalSave") handleSave();
-            if (event.component.key === "internalSend") handleSend();
+            if (event.type === "internalSave") {
+              handleSave();
+            }
+
+            if (event.type === "internalSend") {
+              handleSend();
+            }
           });
         })
         .catch((err) => console.error("Formio Error:", err));
@@ -94,15 +139,23 @@ export default function WorkflowFormContent({ data, onBack }) {
       if (instance?.destroy) instance.destroy();
       if (formRef.current) formRef.current.innerHTML = "";
     };
-  }, [data]);
+  }, [data, handleSave, handleSend]);
 
   return (
     <div className="workflow-container">
       <div className="workflow-header-row">
         <h2 className="form-title">
-          {data.workflow?.text || data.workflow?.name || "Workflow"}
+          {data.workflow?.text ||
+            data.workflow?.name ||
+            "Workflow"}
         </h2>
       </div>
+
+      {loading && (
+        <div className="form-loading">
+          Saving...
+        </div>
+      )}
 
       <div className="workflow-card">
         <div ref={formRef} />

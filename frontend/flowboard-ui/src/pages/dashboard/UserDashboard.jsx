@@ -110,7 +110,7 @@ function DefaultDashboardContent({
       );
 
     case "inbox":
-      return <InboxTable />;
+      return <InboxTable documentTypes={workflows} />;
 
     case "completed":
       return (

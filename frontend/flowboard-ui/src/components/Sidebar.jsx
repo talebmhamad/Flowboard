@@ -1,17 +1,15 @@
 import React, { useState } from "react";
-import { logout } from "../utils/authStorage";
 import "../styles/sidebar.css";
 
 export default function Sidebar({
   activeTab,
   setActiveTab,
-  onSelectWorkflow,
   user,
   summary
 }) {
   const [isCollapsed, setIsCollapsed] = useState(false);
 
-  // 🔥 helper to get counts safely
+  // Safe counts
   const getCounts = (key) => ({
     today: summary?.[key]?.today ?? 0,
     total: summary?.[key]?.total ?? 0
@@ -26,12 +24,14 @@ export default function Sidebar({
 
   return (
     <aside className={`sidebar ${isCollapsed ? "collapsed" : ""}`}>
+      
       {/* HEADER */}
       <div className="sidebar-header">
         <div className="logo-wrapper">
           <div className="logo-icon">F</div>
           {!isCollapsed && <span className="brand-name">FlowBoard</span>}
         </div>
+
         <button
           className="toggle-btn"
           onClick={() => setIsCollapsed(!isCollapsed)}
@@ -55,10 +55,7 @@ export default function Sidebar({
               className={`nav-item ${
                 activeTab === item.key ? "active" : ""
               }`}
-              onClick={() => {
-                setActiveTab(item.key);
-                onSelectWorkflow(null);
-              }}
+              onClick={() => setActiveTab(item.key)} 
               title={isCollapsed ? item.label : ""}
             >
               <div className="nav-icon-box">
@@ -69,7 +66,7 @@ export default function Sidebar({
                 <>
                   <span className="label">{item.label}</span>
 
-                  {/* 🔥 COUNTS BADGES */}
+                  {/* COUNTS */}
                   {item.key !== "home" && (
                     <div className="badge-container">
                       <span className="badge-today">
@@ -97,6 +94,7 @@ export default function Sidebar({
           <div className="user-avatar">
             {user?.fullName?.charAt(0) || "Y"}
           </div>
+
           {!isCollapsed && (
             <div className="user-info">
               <span className="user-name">{user?.fullName}</span>
@@ -105,6 +103,7 @@ export default function Sidebar({
           )}
         </div>
       </div>
+
     </aside>
   );
 }
