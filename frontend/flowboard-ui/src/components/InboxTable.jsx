@@ -1,34 +1,29 @@
 import React, { useEffect, useState } from "react";
+import DataTableModule from "react-data-table-component";
 import { getActiveTasks } from "../services/taskService";
+import { getStatuses } from "../services/statusService";
 import TaskFilters from "./TaskFilters";
 import "../styles/Inbox.css";
 
 export default function InboxTable({ documentTypes = [] }) {
+  const DataTable = DataTableModule.default;
+
   const [tasks, setTasks] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  const statusOptions = [
-    { value: "", label: "" },
-    { value: "Delayed", label: "Delayed" },
-    { value: "Pending", label: "Pending" },
-    { value: "Postponed", label: "Postponed" },
-    { value: "For Approval", label: "For Approval" },
-    { value: "In Progress", label: "In Progress" },
-    { value: "Approved", label: "Approved" },
-    { value: "Rejected", label: "Rejected" },
-  ];
+  const [page, setPage] = useState(1);
+  const [pageSize, setPageSize] = useState(10);
+  const [totalRows, setTotalRows] = useState(0);
 
-  const docTypeOptions = documentTypes.map((wf) => ({
-    value: wf.name,
-    label: wf.text || wf.name,
-  }));
+  const [statuses, setStatuses] = useState([]);
 
+  // ✅ FIXED: single values (not arrays)
   const initialFormState = {
     refNumber: "",
     fromDate: "",
     toDate: "",
-    docType: [],
-    status: [],
+    docType: null,
+    status: null,
     read: false,
     locked: false,
     assigned: false,
@@ -37,173 +32,193 @@ export default function InboxTable({ documentTypes = [] }) {
 
   const [formState, setFormState] = useState(initialFormState);
 
+  //  LOAD STATUS 
   useEffect(() => {
-    loadInbox({});
+    const fetchStatuses = async () => {
+      try {
+        const data = await getStatuses();
+        setStatuses(data);
+      } catch (err) {
+        console.error("Status load error:", err);
+      }
+    };
+
+    fetchStatuses();
   }, []);
 
-  const loadInbox = async (searchFilters) => {
+  //  LOAD INBOX 
+  useEffect(() => {
+    loadInbox(initialFormState, 1, pageSize);
+  }, []);
+
+  const loadInbox = async (filters, pageNumber = 1, size = 10) => {
     try {
       setLoading(true);
 
-      const formattedFilters = {
-        ...searchFilters,
-        docType: searchFilters.docType?.map((o) => o.value) || [],
-        status: searchFilters.status?.map((o) => o.value) || [],
+      const request = {
+        draw: 1,
+        start: (pageNumber - 1) * size,
+        length: size,
+        nodeId: 2,
+
+        //  FIXED (no array)
+        documentTypeId: filters.docType?.value || 0,
+        statusId: filters.status?.value || 0,
+
+        referenceNumber: filters.refNumber || "",
+
+        fromDate: filters.fromDate
+          ? new Date(filters.fromDate).toISOString()
+          : null,
+        toDate: filters.toDate
+          ? new Date(filters.toDate).toISOString()
+          : null,
+
+        read: filters.read,
+        locked: filters.locked,
+        assigned: filters.assigned,
+        overdue: filters.overdue,
       };
 
-      const data = await getActiveTasks(formattedFilters);
-      const taskList = Array.isArray(data) ? data : data.tasks || [];
-      setTasks(taskList);
+      const res = await getActiveTasks(request);
+
+      const mapped = (res.data || []).map((t) => ({
+        ...t,
+        status: t.status || "Pending",
+      }));
+
+      setTasks(mapped);
+      setTotalRows(res.recordsFiltered || 0);
     } catch (err) {
-      console.error("Failed to fetch inbox:", err);
+      console.error("Inbox error:", err);
     } finally {
       setLoading(false);
     }
   };
 
+  //  HANDLERS 
   const handleInputChange = (e) => {
     const { name, value, type, checked } = e.target;
+
     setFormState((prev) => ({
       ...prev,
       [name]: type === "checkbox" ? checked : value,
     }));
   };
 
-  const handleMultiSelectChange = (selectedOptions, actionMeta) => {
-    setFormState((prev) => ({
-      ...prev,
-      [actionMeta.name]: selectedOptions,
-    }));
-  };
-
   const handleSearch = () => {
-    loadInbox(formState);
+    setPage(1);
+    loadInbox(formState, 1, pageSize);
   };
 
   const handleClear = () => {
     setFormState(initialFormState);
-    loadInbox({});
+    setPage(1);
+    loadInbox(initialFormState, 1, pageSize);
   };
 
-  const customSelectStyles = {
-    control: (base, state) => ({
-      ...base,
-      borderColor: state.isFocused ? "#4e9776" : "#d2d6de",
-      minHeight: "34px",
-      borderRadius: "3px",
-      fontSize: "13px",
-      boxShadow: state.isFocused ? "0 0 0 1px rgba(78, 151, 118, 0.2)" : null,
-      "&:hover": { borderColor: "#4e9776" },
-    }),
-    multiValue: (base) => ({
-      ...base,
-      backgroundColor: "#4e9776",
-      borderRadius: "2px",
-    }),
-    multiValueLabel: (base) => ({
-      ...base,
-      color: "white",
-      padding: "2px 6px",
-    }),
-    multiValueRemove: (base) => ({
-      ...base,
-      color: "white",
-      "&:hover": { backgroundColor: "#3d7a5d", color: "white" },
-    }),
+  //  PAGINATION 
+  const handlePageChange = (p) => {
+    setPage(p);
+    loadInbox(formState, p, pageSize);
   };
 
-  if (loading)
-    return <div className="loader-container">Loading your inbox...</div>;
+  const handlePerRowsChange = (newSize, p) => {
+    setPageSize(newSize);
+    loadInbox(formState, p, newSize);
+  };
 
+  //  OPTIONS 
+  const docTypeOptions = documentTypes.map((wf) => ({
+    value: wf.id,
+    label: wf.text,
+  }));
+
+  const statusOptions = statuses.map((s) => ({
+    value: s.id,
+    label: s.text,
+    color: s.color,
+  }));
+
+  //  COLUMNS 
+  const columns = [
+    {
+      name: "Document Type",
+      selector: (row) => row.documentType || "N/A",
+      sortable: true,
+    },
+    {
+      name: "Reference Number",
+      selector: (row) => row.referenceNumber || "---",
+      sortable: true,
+    },
+    {
+      name: "Task Date",
+      selector: (row) => row.taskDate || "-",
+      sortable: true,
+    },
+    {
+      name: "Created Date",
+      selector: (row) => row.createdDate || "-",
+      sortable: true,
+    },
+    {
+      name: "Status",
+      cell: (row) => {
+        const statusText = String(row.status || "Pending");
+
+        return (
+          <span
+            className={`status-badge ${statusText
+              .toLowerCase()
+              .replace(/\s+/g, "-")}`}
+          >
+            {statusText}
+          </span>
+        );
+      },
+    },
+    {
+      name: "",
+      cell: () => (
+        <div style={{ display: "flex", justifyContent: "flex-end" }}>
+          <button className="btn-edit-square">
+            <i className="bi bi-pencil"></i>
+          </button>
+        </div>
+      ),
+    },
+  ];
+
+  //  UI 
   return (
     <div className="inbox-container">
-
       <TaskFilters
         formState={formState}
         handleInputChange={handleInputChange}
-        handleMultiSelectChange={handleMultiSelectChange}
         handleSearch={handleSearch}
         handleClear={handleClear}
         docTypeOptions={docTypeOptions}
         statusOptions={statusOptions}
-        customSelectStyles={customSelectStyles}
       />
 
       <div className="table-wrapper">
-        <table className="inbox-table">
-          <thead>
-            <tr>
-              <th width="40"></th>
-              <th>Document type <span className="sort-arrows">⇅</span></th>
-              <th>Reference Number <span className="sort-arrows">⇅</span></th>
-              <th>Task date <span className="sort-arrows">⇅</span></th>
-              <th>Created date <span className="sort-arrows">⇅</span></th>
-              <th>Status <span className="sort-arrows">⇅</span></th>
-              <th className="text-right"></th>
-            </tr>
-          </thead>
-
-          <tbody>
-            {tasks.length > 0 ? (
-              tasks.map((task, idx) => (
-                <tr key={task.id || idx}>
-                  <td className="center-cell">
-                    <button className="btn-plus">+</button>
-                  </td>
-
-                  <td className="doc-type-cell">
-                    {task.documentType || "N/A"}
-                  </td>
-
-                  <td>{task.referenceNumber || "---"}</td>
-                  <td>{task.taskDate}</td>
-                  <td>{task.createdDate}</td>
-
-                  <td>
-                    <span
-                      className={`status-badge ${
-                        task.status?.toLowerCase().replace(/\s+/g, "-") ||
-                        "pending"
-                      }`}
-                    >
-                      {task.status || "Pending"}
-                    </span>
-                  </td>
-
-                  <td className="action-cell">
-                    <div className="action-icons">
-                      <span className="icon-msg">✉</span>
-                      <span className="icon-user">👤</span>
-                      <button className="btn-edit-square">📝</button>
-                    </div>
-                  </td>
-                </tr>
-              ))
-            ) : (
-              <tr>
-                <td colSpan="7" className="text-center">
-                  No tasks found.
-                </td>
-              </tr>
-            )}
-          </tbody>
-        </table>
-
-        <div className="table-footer">
-          <div className="entry-info">
-            Showing 1 to {tasks.length} of {tasks.length} entries
-          </div>
-
-          <div className="pagination-controls">
-            <button className="page-nav" disabled>
-              Previous
-            </button>
-            <button className="page-number active">1</button>
-            <button className="page-nav" disabled>
-              Next
-            </button>
-          </div>
-        </div>
+        <DataTable
+          key="inbox-table"
+          columns={columns}
+          data={tasks}
+          progressPending={loading && tasks.length === 0}
+          pagination
+          paginationServer
+          paginationTotalRows={totalRows}
+          paginationPerPage={pageSize}
+          onChangePage={handlePageChange}
+          onChangeRowsPerPage={handlePerRowsChange}
+          highlightOnHover
+          striped
+          responsive
+          persistTableHead
+        />
       </div>
     </div>
   );

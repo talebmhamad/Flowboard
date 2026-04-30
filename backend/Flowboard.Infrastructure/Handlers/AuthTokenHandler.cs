@@ -39,6 +39,5 @@ namespace Flowboard.Infrastructure.Handlers
             return await base.SendAsync(request, cancellationToken);
         }
 
-
     }
 }

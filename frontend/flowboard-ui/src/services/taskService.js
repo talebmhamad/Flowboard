@@ -1,12 +1,38 @@
 import { apiFetch } from "../utils/apiClient";
 import { API_URL } from "../config";
 
-/**
- *  Get Active Tasks (Inbox)
- */
-export const getActiveTasks = async () => {
+export const getActiveTasks = async (filters = {}) => {
   try {
-    const data = await apiFetch(`${API_URL}/tasks/active`);
+    const request = {
+      draw: 1,
+      start: filters.start || 0,
+      length: filters.length || 10,
+
+      nodeId: 1, 
+
+      documentTypeId: filters.docType?.[0] || 0,
+      statusId: filters.status?.[0] || 0,
+      referenceNumber: filters.refNumber || "",
+
+      fromDate: filters.fromDate || null,
+      toDate: filters.toDate || null,
+
+      read: filters.read || false,
+      locked: filters.locked || false,
+      assigned: filters.assigned || false,
+      overdue: filters.overdue || false
+    };
+
+    console.log("getActiveTasks request:", request);
+
+    const data = await apiFetch(`${API_URL}/tasks/active`, {
+      method: "POST",
+      body: JSON.stringify(request),
+      headers: {
+        "Content-Type": "application/json"
+      }
+    });
+    console.log("getActiveTasks response:", data);
     return data;
   } catch (error) {
     console.error("Error in getActiveTasks:", error);

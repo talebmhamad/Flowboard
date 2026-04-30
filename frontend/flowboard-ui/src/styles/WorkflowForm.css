@@ -3,15 +3,14 @@
   --border-color: #e2e8f0;
   --text-muted: #475569;
   
-  --btn-save-bg: #22c55e;    /* Clean Emerald Green */
-  --btn-send-bg: #3b82f6;    /* Standard Modern Blue */
+  --btn-save-bg: #22c55e;    
+  --btn-send-bg: #3b82f6;   
   --btn-hover-opacity: 0.9;
 }
 
 .workflow-container {
   background-color: var(--bg-page);
   min-height: 100vh;
-  padding: 30px;
   font-family: 'Inter', sans-serif;
 }
 
@@ -30,48 +29,57 @@
   margin-bottom: 24px;
 }
 
-.form-internal-actions {
-  margin-top: 2rem;
-  padding-top: 1.5rem;
-  border-top: 1px solid var(--border-color);
-}
-
-.btn-inside-save button, 
-.btn-inside-send button {
-  padding: 10px 24px !important;
-  font-size: 0.875rem !important;
-  font-weight: 600 !important;
-  border-radius: 8px !important;
-  border: none !important;
-  color: #ffffff !important;
-  cursor: pointer;
-  transition: all 0.2s ease !important;
-  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05) !important;
-}
-
-.btn-inside-save button {
-  background-color: var(--btn-save-bg) !important;
-}
-
-.btn-inside-send button {
-  background-color: var(--btn-send-bg) !important;
-}
-
-.btn-inside-save button:hover, 
-.btn-inside-send button:hover {
-  filter: brightness(1.05);
-  transform: translateY(-1px);
-  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1) !important;
-}
-
-.btn-inside-save button:active, 
-.btn-inside-send button:active {
-  transform: translateY(0);
-}
-
 .form-control {
   border: 1px solid var(--border-color) !important;
   border-radius: 8px !important;
   padding: 0.6rem 0.8rem !important;
   color: #1e293b !important;
+}
+
+/* ACTIONS CONTAINER */
+.form-actions {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 24px;
+}
+
+.form-actions .btn-group {
+  display: inline-flex;
+  border-radius: 8px;
+  overflow: hidden;
+  border: 1px solid var(--border-color);
+}
+
+.form-actions .btn {
+  padding: 10px 24px;
+  font-size: 0.875rem;
+  font-weight: 600;
+  border: none;
+  color: #ffffff;
+  cursor: pointer;
+  transition: none; 
+}
+
+/* MERGE EFFECT */
+.form-actions .btn + .btn {
+  border-left: 1px solid rgba(255,255,255,0.2);
+}
+
+/* COLORS */
+.form-actions .btn-save {
+  background-color: var(--btn-save-bg);
+}
+
+.form-actions .btn-send {
+  background-color: var(--btn-send-bg);
+}
+
+.form-actions .btn:active {
+  transform: translateY(1px);
+}
+
+/* DISABLED */
+.form-actions .btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
 }

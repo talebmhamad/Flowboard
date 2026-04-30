@@ -1,11 +1,11 @@
 import React, { useState } from "react";
 import "../styles/sidebar.css";
+import { useAppContext } from "../context/AppContext";
 
 export default function Sidebar({
   activeTab,
   setActiveTab,
-  user,
-  summary
+  user
 }) {
   const [isCollapsed, setIsCollapsed] = useState(false);
 
@@ -21,6 +21,8 @@ export default function Sidebar({
     { key: "completed", label: "Completed", icon: "bi-patch-check-all" },
     { key: "draft", label: "Drafts", icon: "bi-file-earmark-diff-fill" }
   ];
+
+  const { summary } = useAppContext();
 
   return (
     <aside className={`sidebar ${isCollapsed ? "collapsed" : ""}`}>

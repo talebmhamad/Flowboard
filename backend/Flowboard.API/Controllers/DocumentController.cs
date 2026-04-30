@@ -20,5 +20,12 @@ namespace Flowboard.API.Controllers
             var result = await _service.SaveDocumentAsync(request);
             return Ok(result);
         }
+
+        [HttpPost("saveandsend")]
+        public async Task<IActionResult> SaveAndSend([FromForm] SaveDocumentDto request)
+        {
+            var result = await _service.SaveAndSendDocumentAsync(request);
+            return Ok(result);
+        }
     }
 }

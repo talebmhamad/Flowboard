@@ -1,17 +1,18 @@
 import React from "react";
 import "../styles/dashboard.css";
+import { useAppContext } from "../context/AppContext";
 
-const HomeDashboard = ({ summary, workflows, onSelectWorkflow }) => {
+const HomeDashboard = ({ workflows, onSelectWorkflow }) => {
   const getCounts = (key) => ({
     today: summary?.[key]?.today ?? 0,
     total: summary?.[key]?.total ?? 0
   });
-
   const cards = [
     { key: "inbox", label: "Inbox", icon: "bi-envelope-paper-fill", class: "inbox" },
     { key: "completed", label: "Completed", icon: "bi-check-square-fill", class: "completed" },
     { key: "draft", label: "Drafts", icon: "bi-pencil-square", class: "drafts" }
   ];
+  const { summary } = useAppContext();
 
   return (
     <div className="dashboard-container">

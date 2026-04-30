@@ -7,14 +7,17 @@ import WorkflowFormContent from "../../components/WorkflowFormContent";
 import HomeDashboard from "../../components/HomeDashboard";
 import InboxTable from "../../components/InboxTable";
 import "../../styles/userDashboard.css";
+import { useAppContext } from "../../context/AppContext";
+
 
 export default function UserDashboard() {
   const [activeTab, setActiveTab] = useState("home");
   const [user, setUser] = useState(null);
-  const [summary, setSummary] = useState(null);
   const [workflows, setWorkflows] = useState([]);
   const [selectedWorkflow, setSelectedWorkflow] = useState(null);
   const [loadingForm, setLoadingForm] = useState(false);
+  const { summary, setSummary } = useAppContext();
+
 
   useEffect(() => {
     const currentUser = getUserFromToken();
@@ -67,7 +70,6 @@ export default function UserDashboard() {
       user={user}
       activeTab={activeTab}
       setActiveTab={handleTabChange} 
-      summary={summary}
       onSelectWorkflow={handleSelectWorkflow}
     >
       {loadingForm ? (
@@ -95,7 +97,6 @@ export default function UserDashboard() {
 
 function DefaultDashboardContent({
   activeTab,
-  summary,
   workflows,
   onSelectWorkflow
 }) {
@@ -103,7 +104,6 @@ function DefaultDashboardContent({
     case "home":
       return (
         <HomeDashboard
-          summary={summary}
           workflows={workflows}
           onSelectWorkflow={onSelectWorkflow}
         />

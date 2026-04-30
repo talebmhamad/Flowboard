@@ -17,15 +17,17 @@ public class DocumentService : IDocumentService
     {
         var content = new MultipartFormDataContent();
 
+        content.Add(new StringContent(request.DocumentTypeId.ToString()), "DocumentTypeId");
+        content.Add(new StringContent(request.FormData, Encoding.UTF8), "FormData");
+
         if (!string.IsNullOrEmpty(request.Id))
             content.Add(new StringContent(request.Id), "Id");
 
-        content.Add(new StringContent(request.DocumentTypeId.ToString()), "DocumentTypeId");
-        content.Add(new StringContent(request.WorkflowId.ToString()), "WorkflowId");
-        content.Add(new StringContent(request.FormData, Encoding.UTF8), "FormData");
-
         if (!string.IsNullOrEmpty(request.RowVersion))
             content.Add(new StringContent(request.RowVersion), "RowVersion");
+
+        if (request.WorkflowId.HasValue)
+            content.Add(new StringContent(request.WorkflowId.Value.ToString()),"WorkflowId");
 
         var response = await _http.PostAsync("Document/SaveWithRowVersion", content);
 
@@ -36,4 +38,31 @@ public class DocumentService : IDocumentService
 
         return result;
     }
+
+    public async Task<string> SaveAndSendDocumentAsync(SaveDocumentDto request)
+    {
+        var content = new MultipartFormDataContent();
+
+        content.Add(new StringContent(request.DocumentTypeId.ToString()), "DocumentTypeId");
+        content.Add(new StringContent(request.FormData, Encoding.UTF8), "FormData");
+
+        if (!string.IsNullOrEmpty(request.Id))
+            content.Add(new StringContent(request.Id), "Id");
+
+        if (request.WorkflowId.HasValue)
+            content.Add(new StringContent(request.WorkflowId.Value.ToString()), "WorkflowId");
+
+        if (!string.IsNullOrEmpty(request.RowVersion))
+            content.Add(new StringContent(request.RowVersion), "RowVersion");
+
+        var response = await _http.PostAsync("Document/SaveAndSendWithRowVersion", content);
+
+        var result = await response.Content.ReadAsStringAsync();
+
+        if (!response.IsSuccessStatusCode)
+            throw new Exception($"Portal API Error: {result}");
+
+        return result;
+    }
+
 }

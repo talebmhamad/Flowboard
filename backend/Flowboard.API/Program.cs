@@ -95,6 +95,27 @@ builder.Services.AddHttpClient<IUserTaskService, UserTaskService>((sp, client) =
 })
 .AddHttpMessageHandler<AuthTokenHandler>();
 
+builder.Services.AddHttpClient<IDocumentService, DocumentService>((sp, client) =>
+{
+    var portalSettings = sp
+        .GetRequiredService<Microsoft.Extensions.Options.IOptions<PortalSettings>>()
+        .Value;
+
+    client.BaseAddress = new Uri(portalSettings.BaseUrl);
+})
+.AddHttpMessageHandler<AuthTokenHandler>();
+
+builder.Services.AddHttpClient<IStatusService, StatusService>((sp, client) =>
+{
+    var portalSettings = sp
+        .GetRequiredService<Microsoft.Extensions.Options.IOptions<PortalSettings>>()
+        .Value;
+
+    client.BaseAddress = new Uri(portalSettings.BaseUrl);
+})
+.AddHttpMessageHandler<AuthTokenHandler>();
+
+
 // User Summary Service
 builder.Services.AddHttpClient<IUserSummaryService, UserSummaryService>((sp, client) =>
 {

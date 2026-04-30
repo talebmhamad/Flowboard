@@ -1,4 +1,5 @@
-﻿using Flowboard.Application.Interfaces;
+﻿using Flowboard.Application.DTOs;
+using Flowboard.Application.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 
 [ApiController]
@@ -12,10 +13,10 @@ public class TasksController : ControllerBase
         _service = service;
     }
 
-    [HttpGet("active")]
-    public async Task<IActionResult> GetActive()
+    [HttpPost("active")]
+    public async Task<IActionResult> GetActive([FromBody] TaskInboxRequestDto request)
     {
-        var result = await _service.GetActiveTasks();
+        var result = await _service.GetActiveTasks(request);
         return Ok(result);
     }
 

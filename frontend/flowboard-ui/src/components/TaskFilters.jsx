@@ -5,7 +5,6 @@ import "../styles/TaskFilters.css";
 export default function TaskFilters({
   formState,
   handleInputChange,
-  handleMultiSelectChange,
   handleSearch,
   handleClear,
   docTypeOptions,
@@ -67,27 +66,35 @@ export default function TaskFilters({
             <div className="filter-group">
               <label>Status</label>
                 <Select
-                name="status"
-                options={statusOptions}
-                styles={customSelectStyles}
-                value={formState.status}
-                onChange={handleMultiSelectChange}
-                placeholder="Select Status"
-              />
+                 name="status"
+                 options={statusOptions}
+                 styles={customSelectStyles}
+                 value={formState.status}
+                 onChange={(selected) =>
+                 handleInputChange({
+                 target: { name: "status", value: selected }
+                })
+                }
+             placeholder="Select Status"
+            />
             </div>
           </div>
 
           <div className="filter-row second-row">
             <div className="filter-group">
               <label>Document type</label>
-              <Select
-                name="docType"
-                options={docTypeOptions}
-                styles={customSelectStyles}
-                value={formState.docType}
-                onChange={handleMultiSelectChange}
-                placeholder="Select Types"
-             />
+<Select
+  name="docType"
+  options={docTypeOptions}
+  styles={customSelectStyles}
+  value={formState.docType}
+  onChange={(selected) =>
+    handleInputChange({
+      target: { name: "docType", value: selected }
+    })
+  }
+  placeholder="Select Type"
+/>
             </div>
 
             <div className="checkbox-group">
