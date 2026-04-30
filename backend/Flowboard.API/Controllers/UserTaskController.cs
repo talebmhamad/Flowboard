@@ -14,30 +14,38 @@ public class TasksController : ControllerBase
     }
 
     [HttpPost("active")]
-    public async Task<IActionResult> GetActive([FromBody] TaskInboxRequestDto request)
+    public async Task<IActionResult> GetActive([FromBody] TaskRequestDto request)
     {
         var result = await _service.GetActiveTasks(request);
         return Ok(result);
     }
 
-    [HttpGet("completed")]
-    public async Task<IActionResult> GetCompleted()
+    [HttpPost("completed")]
+    public async Task<IActionResult> GetCompleted([FromBody] TaskRequestDto  request)
     {
-        var result = await _service.GetCompletedTasks();
+        var result = await _service.GetCompletedTasks(request);
         return Ok(result);
     }
 
-    [HttpGet("draft")]
-    public async Task<IActionResult> GetDraft()
+    [HttpPost("draft")]
+    public async Task<IActionResult> GetDraft([FromBody] TaskRequestDto request)
     {
-        var result = await _service.GetDraftTasks();
+        var result = await _service.GetDraftTasks(request);
         return Ok(result);
     }
 
-    [HttpGet("myrequests")]
-    public async Task<IActionResult> GetMyRequests()
+    [HttpGet("details/{taskId}")]
+    public async Task<IActionResult> GetTaskDetails(int taskId)
     {
-        var result = await _service.GetMyRequests();
+        var result = await _service.GetTaskDetails(taskId);
         return Ok(result);
     }
+
+    [HttpPost("save")]
+    public async Task<IActionResult> SaveTask([FromForm] SaveTaskDto request)
+    {
+        var result = await _service.SaveTaskAsync(request);
+        return Ok(result);
+    }
+
 }

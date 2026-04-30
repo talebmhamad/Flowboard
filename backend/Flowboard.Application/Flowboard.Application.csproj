@@ -43,8 +43,9 @@
   <ItemGroup>
     <Compile Include="DTOs\CountDto.cs" />
     <Compile Include="DTOs\SaveDocumentDto.cs" />
+    <Compile Include="DTOs\SaveTaskDto.cs" />
     <Compile Include="DTOs\StatusDto.cs" />
-    <Compile Include="DTOs\TaskInboxRequestDto.cs" />
+    <Compile Include="DTOs\TaskRequestDto.cs" />
     <Compile Include="DTOs\WorkflowDto.cs" />
     <Compile Include="DTOs\LoginDto.cs" />
     <Compile Include="DTOs\UserSummaryDto.cs" />

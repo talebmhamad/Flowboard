@@ -1,17 +1,11 @@
-import { useEffect, useState } from "react";
-import { getStatuses } from "../services/statusService";
+import { apiFetch } from "../utils/apiClient";
+import { API_URL } from "../config";
 
-const [statuses, setStatuses] = useState([]);
-
-useEffect(() => {
-  const fetchStatuses = async () => {
-    try {
-      const data = await getStatuses();
-      setStatuses(data);
-    } catch (err) {
-      console.error(err);
-    }
-  };
-
-  fetchStatuses();
-}, []);
+export const getStatuses = async () => {
+  try {
+    return await apiFetch(`${API_URL}/status`);
+  } catch (error) {
+    console.error("Error in getStatuses:", error);
+    throw error;
+  }
+};

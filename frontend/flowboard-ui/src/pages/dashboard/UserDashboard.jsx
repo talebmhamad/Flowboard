@@ -6,8 +6,11 @@ import { getWorkflows, getWorkflowForm } from "../../services/workflowService";
 import WorkflowFormContent from "../../components/WorkflowFormContent";
 import HomeDashboard from "../../components/HomeDashboard";
 import InboxTable from "../../components/InboxTable";
+import CompleteTable from "../../components/CompletedTable";
+import DraftTable from "../../components/DraftTable";
 import "../../styles/userDashboard.css";
 import { useAppContext } from "../../context/AppContext";
+import { ImageOff } from "lucide-react";
 
 
 export default function UserDashboard() {
@@ -17,7 +20,6 @@ export default function UserDashboard() {
   const [selectedWorkflow, setSelectedWorkflow] = useState(null);
   const [loadingForm, setLoadingForm] = useState(false);
   const { summary, setSummary } = useAppContext();
-
 
   useEffect(() => {
     const currentUser = getUserFromToken();
@@ -113,20 +115,10 @@ function DefaultDashboardContent({
       return <InboxTable documentTypes={workflows} />;
 
     case "completed":
-      return (
-        <div className="dashboard-card">
-          <h2>Completed Items</h2>
-          <p>No completed tasks yet.</p>
-        </div>
-      );
+      return <CompleteTable documentTypes={workflows} />;
 
     case "draft":
-      return (
-        <div className="dashboard-card">
-          <h2>Draft Items</h2>
-          <p>No draft tasks yet.</p>
-        </div>
-      );
+      return <DraftTable documentTypes={workflows} />;
 
     default:
       return null;

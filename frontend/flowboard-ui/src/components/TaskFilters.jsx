@@ -9,10 +9,11 @@ export default function TaskFilters({
   handleClear,
   docTypeOptions,
   statusOptions,
-  customSelectStyles
+  customSelectStyles,
+  IsCompletedTable, 
+  IsDraftTable
 }) {
   const [isCollapsed, setIsCollapsed] = useState(false);
-
   const toggleCollapse = () => {
     setIsCollapsed(prev => !prev);
   };
@@ -32,7 +33,10 @@ export default function TaskFilters({
       {!isCollapsed && (
         <div className="filter-body">
           
+
           <div className="filter-row">
+
+          {IsCompletedTable && (
             <div className="filter-group">
               <label>Reference Number</label>
               <input
@@ -42,7 +46,7 @@ export default function TaskFilters({
                 onChange={handleInputChange}
               />
             </div>
-
+          )}
             <div className="filter-group">
               <label>From date</label>
               <input
@@ -62,6 +66,7 @@ export default function TaskFilters({
                 onChange={handleInputChange}
               />
             </div>
+          {IsCompletedTable && (
 
             <div className="filter-group">
               <label>Status</label>
@@ -78,6 +83,7 @@ export default function TaskFilters({
              placeholder="Select Status"
             />
             </div>
+          )}
           </div>
 
           <div className="filter-row second-row">
@@ -97,19 +103,28 @@ export default function TaskFilters({
 />
             </div>
 
-            <div className="checkbox-group">
-              <label><input type="checkbox" name="read" checked={formState.read} onChange={handleInputChange}/> Read</label>
-              <label><input type="checkbox" name="locked" checked={formState.locked} onChange={handleInputChange}/> Locked</label>
-              <label><input type="checkbox" name="assigned" checked={formState.assigned} onChange={handleInputChange}/> Assigned</label>
-              <label><input type="checkbox" name="overdue" checked={formState.overdue} onChange={handleInputChange}/> Overdue</label>
-            </div>
+           {IsCompletedTable && !IsDraftTable && (
+    <div className="checkbox-group">
+      <label>
+        <input type="checkbox" name="read" checked={formState.read} onChange={handleInputChange}/> Read
+      </label>
+      <label>
+        <input type="checkbox" name="locked" checked={formState.locked} onChange={handleInputChange}/> Locked
+      </label>
+      <label>
+        <input type="checkbox" name="assigned" checked={formState.assigned} onChange={handleInputChange}/> Assigned
+      </label>
+      <label>
+        <input type="checkbox" name="overdue" checked={formState.overdue} onChange={handleInputChange}/> Overdue
+      </label>
+    </div>
+          )}
+         
           </div>
-
           <div className="filter-actions">
             <button className="btn-search" onClick={handleSearch}>Search</button>
             <button className="btn-clear" onClick={handleClear}>Clear</button>
           </div>
-
         </div>
       )}
     </div>

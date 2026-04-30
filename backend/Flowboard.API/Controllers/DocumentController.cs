@@ -8,7 +8,6 @@ namespace Flowboard.API.Controllers
     public class DocumentController : ControllerBase
     {
         private readonly IDocumentService _service;
-
         public DocumentController(IDocumentService service)
         {
             _service = service;
@@ -25,6 +24,20 @@ namespace Flowboard.API.Controllers
         public async Task<IActionResult> SaveAndSend([FromForm] SaveDocumentDto request)
         {
             var result = await _service.SaveAndSendDocumentAsync(request);
+            return Ok(result);
+        }
+
+        [HttpGet("basic-info/{taskId}")]
+        public async Task<IActionResult> GetBasicInfo(int taskId)
+        {
+            var result = await _service.GetDocumentBasicInfoByTaskId(taskId);
+            return Ok(result);
+        }
+
+        [HttpGet("by-task/{taskId}")]
+        public async Task<IActionResult> GetByTaskId(int taskId)
+        {
+            var result = await _service.GetDocumentByTaskId(taskId);
             return Ok(result);
         }
     }

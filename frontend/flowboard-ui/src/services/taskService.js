@@ -2,6 +2,7 @@ import { apiFetch } from "../utils/apiClient";
 import { API_URL } from "../config";
 
 export const getActiveTasks = async (filters = {}) => {
+  
   try {
     const request = {
       draw: 1,
@@ -10,9 +11,9 @@ export const getActiveTasks = async (filters = {}) => {
 
       nodeId: 1, 
 
-      documentTypeId: filters.docType?.[0] || 0,
-      statusId: filters.status?.[0] || 0,
-      referenceNumber: filters.refNumber || "",
+      documentTypeId: filters.documentTypeId || 0,
+      statusId: filters.statusId || 0,
+      referenceNumber: filters.referenceNumber || "",
 
       fromDate: filters.fromDate || null,
       toDate: filters.toDate || null,
@@ -23,29 +24,45 @@ export const getActiveTasks = async (filters = {}) => {
       overdue: filters.overdue || false
     };
 
-    console.log("getActiveTasks request:", request);
-
     const data = await apiFetch(`${API_URL}/tasks/active`, {
       method: "POST",
       body: JSON.stringify(request),
       headers: {
         "Content-Type": "application/json"
       }
+   
     });
-    console.log("getActiveTasks response:", data);
     return data;
   } catch (error) {
     console.error("Error in getActiveTasks:", error);
     throw error;
   }
 };
-
 /**
  *  Get Completed Tasks
  */
-export const getCompletedTasks = async () => {
+export const getCompletedTasks = async (filters = {}) => {
   try {
-    const data = await apiFetch(`${API_URL}/tasks/completed`);
+    const request = {
+      draw: 1,
+      start: filters.start || 0,
+      length: filters.length || 10,
+      nodeId: 1,
+      documentTypeId: filters.documentTypeId || 0,
+      statusId: filters.statusId || 0,
+      referenceNumber: filters.referenceNumber || "",
+      fromDate: filters.fromDate || null,
+      toDate: filters.toDate || null,
+    };
+
+    const data = await apiFetch(`${API_URL}/tasks/completed`, {
+      method: "POST",
+      body: JSON.stringify(request),
+      headers: {
+        "Content-Type": "application/json"
+      }
+    });
+
     return data;
   } catch (error) {
     console.error("Error in getCompletedTasks:", error);
@@ -56,10 +73,26 @@ export const getCompletedTasks = async () => {
 /**
  *  Get Draft Tasks
  */
-export const getDraftTasks = async () => {
+export const getDraftTasks = async (filters = {}) => {
   try {
-    const data = await apiFetch(`${API_URL}/tasks/draft`);
-    return data;
+    const request = {
+      draw: 1,
+      start: filters.start || 0,
+      length: filters.length || 10,
+      nodeId: 1, 
+      documentTypeId: filters.documentTypeId || 0,
+      fromDate: filters.fromDate || null,
+      toDate: filters.toDate || null,
+    };
+
+    return await apiFetch(`${API_URL}/tasks/draft`, {
+      method: "POST",
+      body: JSON.stringify(request),
+      headers: {
+        "Content-Type": "application/json"
+      }
+    });
+
   } catch (error) {
     console.error("Error in getDraftTasks:", error);
     throw error;
@@ -67,14 +100,40 @@ export const getDraftTasks = async () => {
 };
 
 /**
- *  Get My Requests
+ * Get Task Details (by taskId)
  */
-export const getMyRequests = async () => {
+export const getTaskDetails = async (taskId) => {
   try {
-    const data = await apiFetch(`${API_URL}/tasks/myrequests`);
+    const data = await apiFetch(`${API_URL}/tasks/details/${taskId}`, {
+      method: "GET"
+    });
+
     return data;
   } catch (error) {
-    console.error("Error in getMyRequests:", error);
+    console.error("Error in getTaskDetails:", error);
+    throw error;
+  }
+};
+
+/**
+ * Save Task (ONLY id + rowVersion + formData)
+ */
+export const saveTask = async ({ id, rowVersion, formData }) => {
+  try {
+    const body = new FormData();
+
+    if (id) body.append("Id", id.toString());
+    if (rowVersion) body.append("RowVersion", rowVersion);
+
+    body.append("FormData", JSON.stringify(formData));
+
+    return await apiFetch(`${API_URL}/tasks/save`, {
+      method: "POST",
+      body
+    });
+
+  } catch (error) {
+    console.error("Error in saveTask:", error);
     throw error;
   }
 };

@@ -1,13 +1,14 @@
 import { apiFetch } from "../utils/apiClient";
 import { API_URL } from "../config";
 
+
 //  Save only
 export const saveDocument = async ({
   documentTypeId,
   workflowId = null,
   formData,
-  id = "",
-  rowVersion = ""
+  id,
+  rowVersion 
 }) => {
   const body = new FormData();
 
@@ -25,7 +26,6 @@ export const saveDocument = async ({
     body
   });
 };
-
 
 //  Save + Send
 export const saveAndSendDocument = async ({
@@ -50,4 +50,21 @@ export const saveAndSendDocument = async ({
     method: "POST",
     body
   });
+};
+
+export const getDocumentBasicInfo = async (taskId) => {
+  try {
+    const data = await apiFetch(`${API_URL}/document/basic-info/${taskId}`, {
+      method: "GET"
+    });
+
+    return data;
+  } catch (error) {
+    console.error("Error in getDocumentBasicInfo:", error);
+    throw error;
+  }
+};
+
+export const getDocumentByTaskId = async (taskId) => {
+  return await apiFetch(`${API_URL}/document/by-task/${taskId}`);
 };
