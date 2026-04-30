@@ -1,10 +1,9 @@
-﻿using Flowboard.Application.Interfaces;
-using Microsoft.AspNetCore.Authorization;
+﻿using Flowboard.Application.DTOs;
+using Flowboard.Application.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 
 [ApiController]
 [Route("api/[controller]")]
-[Authorize(Roles = "User")]
 public class TasksController : ControllerBase
 {
     private readonly IUserTaskService _service;
@@ -14,10 +13,10 @@ public class TasksController : ControllerBase
         _service = service;
     }
 
-    [HttpGet("active")]
-    public async Task<IActionResult> GetActive()
+    [HttpPost("active")]
+    public async Task<IActionResult> GetActive([FromBody] TaskInboxRequestDto request)
     {
-        var result = await _service.GetActiveTasks();
+        var result = await _service.GetActiveTasks(request);
         return Ok(result);
     }
 

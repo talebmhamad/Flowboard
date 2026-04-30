@@ -1,5 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using Flowboard.Application.Interfaces;
+﻿using Flowboard.Application.Interfaces;
+using Microsoft.AspNetCore.Mvc;
 
 namespace Flowboard.API.Controllers;
 
@@ -19,5 +19,12 @@ public class WorkflowController : ControllerBase
     {
         var workflows = await _workflowService.GetWorkflowsAsync();
         return Ok(workflows);
+    }
+
+    [HttpGet("form/{documentTypeId}")]
+    public async Task<IActionResult> GetForm(int documentTypeId)
+    {
+        var form = await _workflowService.GetWorkflowFormAsync(documentTypeId);
+        return Ok(form);
     }
 }

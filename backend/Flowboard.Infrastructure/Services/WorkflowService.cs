@@ -1,5 +1,6 @@
 ﻿using Flowboard.Application.DTOs;
 using Flowboard.Application.Interfaces;
+using Microsoft.AspNetCore.Http;
 using System;
 using System.Collections.Generic;
 using System.Net.Http;
@@ -11,7 +12,6 @@ namespace Flowboard.Infrastructure.Services
     public class WorkflowService : IWorkflowService
     {
         private readonly HttpClient _http;
-
         public WorkflowService(HttpClient http)
         {
             _http = http;
@@ -19,15 +19,11 @@ namespace Flowboard.Infrastructure.Services
 
         public async Task<List<WorkflowDto>> GetWorkflowsAsync()
         {
-            var url = "DocumentType/ListDocumentTypes?delegationId=null";
+            var url = $"DocumentType/ListByUser?delegationId=Null";
 
             var response = await _http.GetAsync(url);
 
             var content = await response.Content.ReadAsStringAsync();
-
-            // 🔥 Debug (remove later)
-            Console.WriteLine("Workflow Response:");
-            Console.WriteLine(content);
 
             if (!response.IsSuccessStatusCode)
                 throw new Exception($"Portal API Error: {response.StatusCode} - {content}");
@@ -42,6 +38,24 @@ namespace Flowboard.Infrastructure.Services
 
             return data ?? new List<WorkflowDto>();
         }
+
+        public async Task<string> GetWorkflowFormAsync(int documentTypeId)
+        {
+            var url = $"Document/GetForm?documentTypeId={documentTypeId}";
+
+            var response = await _http.GetAsync(url);
+
+            var content = await response.Content.ReadAsStringAsync();
+
+            if (!response.IsSuccessStatusCode)
+                throw new Exception($"Portal API Error: {response.StatusCode} - {content}");
+
+            if (string.IsNullOrWhiteSpace(content))
+                return "{}";
+
+            return content; 
+        }
+
     }
 
 }

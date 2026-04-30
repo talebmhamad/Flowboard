@@ -4,11 +4,8 @@ using System.Threading.Tasks;
 
 namespace Flowboard.Application.Interfaces
 {
-
-
-    public interface IWorkflowService
+    public interface IStatusService
     {
-        Task<List<WorkflowDto>> GetWorkflowsAsync();
-        Task<string> GetWorkflowFormAsync(int documentTypeId);
+        Task<List<StatusDto>> GetAllAsync();
     }
 }

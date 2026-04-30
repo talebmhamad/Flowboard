@@ -1,0 +1,85 @@
+:root {
+  --bg-page: #f8fafc;
+  --border-color: #e2e8f0;
+  --text-muted: #475569;
+  
+  --btn-save-bg: #22c55e;    
+  --btn-send-bg: #3b82f6;   
+  --btn-hover-opacity: 0.9;
+}
+
+.workflow-container {
+  background-color: var(--bg-page);
+  min-height: 100vh;
+  font-family: 'Inter', sans-serif;
+}
+
+.workflow-card {
+  background: #ffffff;
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  padding: 32px;
+  box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+}
+
+.form-title {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: #1e293b;
+  margin-bottom: 24px;
+}
+
+.form-control {
+  border: 1px solid var(--border-color) !important;
+  border-radius: 8px !important;
+  padding: 0.6rem 0.8rem !important;
+  color: #1e293b !important;
+}
+
+/* ACTIONS CONTAINER */
+.form-actions {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 24px;
+}
+
+.form-actions .btn-group {
+  display: inline-flex;
+  border-radius: 8px;
+  overflow: hidden;
+  border: 1px solid var(--border-color);
+}
+
+.form-actions .btn {
+  padding: 10px 24px;
+  font-size: 0.875rem;
+  font-weight: 600;
+  border: none;
+  color: #ffffff;
+  cursor: pointer;
+  transition: none; 
+}
+
+/* MERGE EFFECT */
+.form-actions .btn + .btn {
+  border-left: 1px solid rgba(255,255,255,0.2);
+}
+
+/* COLORS */
+.form-actions .btn-save {
+  background-color: var(--btn-save-bg);
+}
+
+.form-actions .btn-send {
+  background-color: var(--btn-send-bg);
+}
+
+.form-actions .btn:active {
+  transform: translateY(1px);
+}
+
+/* DISABLED */
+.form-actions .btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
