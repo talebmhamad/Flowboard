@@ -110,11 +110,11 @@ namespace Flowboard.Infrastructure.Services
         {
             var content = new MultipartFormDataContent();
 
-            if (!string.IsNullOrEmpty(request.Id))
-                content.Add(new StringContent(request.Id), "Id");
+            if (!string.IsNullOrEmpty(request.id))
+                content.Add(new StringContent(request.id), "id");
 
-            if (!string.IsNullOrEmpty(request.RowVersion))
-                content.Add(new StringContent(request.RowVersion), "RowVersion");
+            if (!string.IsNullOrEmpty(request.rowVersion))
+                content.Add(new StringContent(request.rowVersion), "rowVersion");
 
             content.Add(new StringContent(request.FormData), "FormData");
 
@@ -124,6 +124,25 @@ namespace Flowboard.Infrastructure.Services
 
             if (!response.IsSuccessStatusCode)
                 throw new Exception($"Portal API Error: {result}");
+
+            return result;
+        }
+
+        public async Task<string> SaveAndSendTaskAsync(SaveTaskDto request)
+        {
+            var content = new MultipartFormDataContent();
+
+            if (!string.IsNullOrEmpty(request.id))
+                content.Add(new StringContent(request.id), "id");
+
+            if (!string.IsNullOrEmpty(request.rowVersion))
+                content.Add(new StringContent(request.rowVersion), "rowVersion");
+
+            content.Add(new StringContent(request.FormData), "FormData");
+
+            var response = await _http.PostAsync("Task/SaveAndSendWithRowVersion", content);
+
+            var result = await response.Content.ReadAsStringAsync();
 
             return result;
         }

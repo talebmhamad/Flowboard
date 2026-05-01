@@ -14,10 +14,10 @@ export default function TaskDetails({ taskId, task: initialTask, status, onBack 
   const [docFull, setDocFull] = useState(null);
   const metaFormRef = useRef(null);
   const metaFormInstanceRef = useRef(null);
-  const { save, saving } = useTask();
+  const { save, saveAndSend, saving, sending } = useTask();
 
    useEffect(() => {
-  if (!taskId) return;
+   if (!taskId) return;
 
   let isMounted = true;
 
@@ -224,7 +224,6 @@ export default function TaskDetails({ taskId, task: initialTask, status, onBack 
 
    }, [docFull, activeTab]);
 
-    //  LOADING 
    if (!task) {
     return (
       <div className="d-flex justify-content-center align-items-center p-5" style={{ minHeight: "300px" }}>
@@ -233,28 +232,11 @@ export default function TaskDetails({ taskId, task: initialTask, status, onBack 
     );
    }
 
-   const handleSend = async () => {
-  if (saving) return; 
+   const handleSave = async () => {
+  if (saving || sending) return;
 
   try {
-    const form = formInstanceRef.current;
-    if (!form) {
-      showError("Form not initialized");
-      return;
-    }
-
-    const isValid = await form.checkValidity(null, true);
-    if (!isValid) {
-      showWarning("Please complete all required fields");
-      return;
-    }
-
-    const formData = form.submission?.data || {};
-
-    if (!task?.id || !task?.rowVersion) {
-      showError("Missing document reference");
-      return;
-    }
+    const formData = formInstanceRef.current?.submission?.data || {};
 
     await save({
       id: task.id,
@@ -262,16 +244,48 @@ export default function TaskDetails({ taskId, task: initialTask, status, onBack 
       formData
     });
 
-    showSuccess("Sent successfully!");
-
-    setTimeout(() => {
-      onBack?.();
-    }, 800);
-
+    showSuccess("Saved successfully!");
   } catch (err) {
-    console.error("Send error:", err);
-    showError("Send failed");
+    console.error(err);
+    showError("Save failed");
   }
+   };
+
+   const handleSend = async () => {
+   if (saving || sending) return;
+
+  try {
+     const form = formInstanceRef.current;
+
+     if (!form) {
+      showError("Form not initialized");
+      return;
+     }
+
+     const isValid = await form.checkValidity(null, true);
+     if (!isValid) {
+      showWarning("Please complete all required fields");
+      return;
+     }
+
+     const formData = form.submission?.data || {};
+
+     await saveAndSend({
+      id: task.id,
+      rowVersion: task.rowVersion,
+      formData
+     });
+
+     showSuccess("Sent successfully!");
+ 
+     setTimeout(() => onBack?.(), 800);
+
+     } 
+     catch (err) {
+      console.error(err);
+      showError("Send failed");
+     }
+
    };
 
    return (
@@ -374,9 +388,6 @@ export default function TaskDetails({ taskId, task: initialTask, status, onBack 
                     </div>
                   </div>
                 </div>
-
-                
-
                 <div className="p-3 border rounded bg-white">
                   {!task.formDesigner ? (
                     <p className="text-muted text-center">
@@ -386,18 +397,27 @@ export default function TaskDetails({ taskId, task: initialTask, status, onBack 
                     <div ref={formRef} />
                   )}
                 </div>
+                <div className="card-footer">
+                  <div className="form-actions">
+                   <div className="btn-group">
+                    <button
+                           className="btn btn-save"
+                           onClick={handleSave}
+                           disabled={saving || sending}
+                           >
+                          {saving ? "Saving..." : "Save"}
+                    </button>
+                    <button
+                           className="btn btn-send"
+                           onClick={handleSend}
+                           disabled={saving || sending}
+                          >
+                           {sending ? "Sending..." : "Send"}
+                    </button>
 
-
-                    <div className="card-footer d-flex justify-content-end gap-2">
-                <button 
-                 className="btn btn-primary px-4"
-                 onClick={handleSend}
-                 disabled={saving}
-               >
-                {saving  ? "Saving..." : "Save"}
-                </button>
-                    </div>
-
+                     </div>
+                  </div>
+               </div>
 
               </>
             )}

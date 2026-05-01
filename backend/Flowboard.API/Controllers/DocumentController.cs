@@ -40,5 +40,12 @@ namespace Flowboard.API.Controllers
             var result = await _service.GetDocumentByTaskId(taskId);
             return Ok(result);
         }
+
+        [HttpGet("{id}")]
+        public async Task<IActionResult> GetById(int id)
+        {
+            var result = await _service.GetDocumentById(id);
+            return Ok(result);
+        }
     }
 }

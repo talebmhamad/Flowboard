@@ -12,4 +12,6 @@ public interface IDocumentService
 
     Task<string> GetDocumentByTaskId(int taskId);
 
+    Task<string> GetDocumentById(int id);
+
 }

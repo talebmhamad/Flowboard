@@ -116,14 +116,14 @@ export const getTaskDetails = async (taskId) => {
 };
 
 /**
- * Save Task (ONLY id + rowVersion + formData)
+ * Save Task 
  */
 export const saveTask = async ({ id, rowVersion, formData }) => {
   try {
     const body = new FormData();
 
-    if (id) body.append("Id", id.toString());
-    if (rowVersion) body.append("RowVersion", rowVersion);
+    if (id) body.append("id", id.toString());
+    if (rowVersion) body.append("rowVersion", rowVersion);
 
     body.append("FormData", JSON.stringify(formData));
 
@@ -134,6 +134,32 @@ export const saveTask = async ({ id, rowVersion, formData }) => {
 
   } catch (error) {
     console.error("Error in saveTask:", error);
+    throw error;
+  }
+};
+
+/**
+ * Save and Send Task 
+ */
+export const saveAndSendTask = async ({ id, rowVersion, formData }) => {
+  try {
+    const body = new FormData();
+
+    if (id) body.append("id", id.toString());
+    if (rowVersion) body.append("rowVersion", rowVersion.toString());
+
+    body.append("FormData", JSON.stringify(formData));
+
+
+    const data = await apiFetch(`${API_URL}/tasks/saveandsend`, {
+      method: "POST",
+      body
+    });
+
+    return data;
+
+  } catch (error) {
+    console.error("Error in saveAndSendTask:", error);
     throw error;
   }
 };

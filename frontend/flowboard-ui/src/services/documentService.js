@@ -68,3 +68,7 @@ export const getDocumentBasicInfo = async (taskId) => {
 export const getDocumentByTaskId = async (taskId) => {
   return await apiFetch(`${API_URL}/document/by-task/${taskId}`);
 };
+
+export const getDocumentById = async (id) => {
+  return await apiFetch(`${API_URL}/document/${id}`);
+};

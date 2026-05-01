@@ -83,4 +83,15 @@ public class DocumentService : IDocumentService
 
         return result;
     }
+    public async Task<string> GetDocumentById(int id)
+    {
+        var response = await _http.GetAsync($"Document/Get?id={id}");
+
+        var result = await response.Content.ReadAsStringAsync();
+
+        if (!response.IsSuccessStatusCode)
+            throw new Exception($"Portal API Error: {result}");
+
+        return result;
+    }
 }

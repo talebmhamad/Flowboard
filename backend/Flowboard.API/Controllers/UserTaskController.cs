@@ -48,4 +48,11 @@ public class TasksController : ControllerBase
         return Ok(result);
     }
 
+    [HttpPost("saveandsend")]
+    public async Task<IActionResult> SaveAndSendTask([FromForm] SaveTaskDto request)
+    {
+        var result = await _service.SaveAndSendTaskAsync(request);
+        return Ok(result);
+    }
+
 }
