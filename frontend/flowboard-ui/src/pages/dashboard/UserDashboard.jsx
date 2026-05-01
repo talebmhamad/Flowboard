@@ -11,6 +11,8 @@ import DraftTable from "../../components/DraftTable";
 import "../../styles/userDashboard.css";
 import { useAppContext } from "../../context/AppContext";
 import { ImageOff } from "lucide-react";
+import { getDocumentBasicInfo } from "../../services/documentService";
+import { getDocumentById } from "../../services/documentService";
 
 
 export default function UserDashboard() {
@@ -67,6 +69,62 @@ export default function UserDashboard() {
     setSelectedWorkflow(null);
   };
 
+  const handleOpenDraft = async (row) => {
+  try {
+    setLoadingForm(true);
+
+    const res = await getDocumentById(row.id);
+
+    setSelectedWorkflow({
+      id: row.id,
+      rowVersion: res.rowVersion,
+      workflow: {
+        id: row.documentTypeId,
+        text: row.documentType
+      },
+      form: {
+        formDesigner: res.formDesigner
+      },
+      formData: res.formData
+    });
+
+  } catch (err) {
+    console.error("Open draft error:", err);
+  } finally {
+    setLoadingForm(false);
+  }
+  };
+
+  function DefaultDashboardContent({
+  activeTab,
+  workflows,
+  onSelectWorkflow
+}) {
+  switch (activeTab) {
+    case "home":
+      return (
+        <HomeDashboard
+          workflows={workflows}
+          onSelectWorkflow={onSelectWorkflow}
+        />
+      );
+
+    case "inbox":
+      return <InboxTable documentTypes={workflows} />;
+
+    case "completed":
+      return <CompleteTable documentTypes={workflows} />;
+
+    case "draft":
+      return (
+       <DraftTable documentTypes={workflows} onOpenDraft={handleOpenDraft}/>
+     );
+
+    default:
+      return null;
+  }
+}
+
   return (
     <DashboardLayout
       user={user}
@@ -95,32 +153,3 @@ export default function UserDashboard() {
   );
 }
 
-
-
-function DefaultDashboardContent({
-  activeTab,
-  workflows,
-  onSelectWorkflow
-}) {
-  switch (activeTab) {
-    case "home":
-      return (
-        <HomeDashboard
-          workflows={workflows}
-          onSelectWorkflow={onSelectWorkflow}
-        />
-      );
-
-    case "inbox":
-      return <InboxTable documentTypes={workflows} />;
-
-    case "completed":
-      return <CompleteTable documentTypes={workflows} />;
-
-    case "draft":
-      return <DraftTable documentTypes={workflows} />;
-
-    default:
-      return null;
-  }
-}

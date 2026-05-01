@@ -4,7 +4,7 @@ import { getDraftTasks } from "../services/taskService";
 import TaskFilters from "./TaskFilters";
 import "../styles/Inbox.css";
 
-export default function DraftTable({ documentTypes = [] }) {
+export default function DraftTable({ documentTypes, onOpenDraft }) {
   const DataTable = DataTableModule.default;
 
   const [tasks, setTasks] = useState([]);
@@ -111,12 +111,12 @@ const columns = [
     name: "",
     width: "80px",
     cell: row => (
-      <button
-        className="btn btn-sm btn-outline-primary"
-        onClick={() => handleEdit(row)}
-      >
-        <i className="bi bi-pencil"></i>
-      </button>
+<button
+  className="btn btn-sm btn-outline-primary"
+  onClick={() => onOpenDraft(row)}
+>
+  <i className="bi bi-pencil"></i>
+</button>
     ),
     ignoreRowClick: true,
     allowOverflow: true,

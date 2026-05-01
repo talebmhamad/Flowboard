@@ -10,8 +10,8 @@ export default function WorkflowFormContent({ data, onBack }) {
   const formInstanceRef = useRef(null);
   const { save, saveAndSend, saving, sending } = useDocument();
   const { setSummary } = useAppContext();
-  
-  //  SAVE 
+
+  //  SAVE
   const handleSave = useCallback(async () => {
     if (saving) return;
 
@@ -32,7 +32,7 @@ export default function WorkflowFormContent({ data, onBack }) {
         workflowId: null,
         formData,
         id: data.id || "",
-        rowVersion: data.rowVersion || ""
+        rowVersion: data.rowVersion || "",
       });
 
       toast.success("Saved successfully!");
@@ -41,16 +41,15 @@ export default function WorkflowFormContent({ data, onBack }) {
       setSummary(newSummary);
 
       setTimeout(() => {
-       onBack();
+        onBack();
       }, 800);
-
     } catch (err) {
       console.error(err);
       toast.error("Save failed");
     }
   }, [data, save, saving]);
 
-  //  SEND 
+  //  SEND
   const handleSend = useCallback(async () => {
     if (sending) return;
 
@@ -71,7 +70,7 @@ export default function WorkflowFormContent({ data, onBack }) {
         workflowId: null,
         formData,
         id: data.id || "",
-        rowVersion: data.rowVersion || ""
+        rowVersion: data.rowVersion || "",
       });
 
       toast.success("Sent successfully!");
@@ -80,16 +79,15 @@ export default function WorkflowFormContent({ data, onBack }) {
       setSummary(newSummary);
 
       setTimeout(() => {
-       onBack();
+        onBack();
       }, 800);
-
     } catch (err) {
       console.error(err);
       toast.error("Send failed");
     }
   }, [data, saveAndSend, sending]);
 
-  //  FORM INIT 
+  //  FORM INIT
   useEffect(() => {
     if (!data?.form || !formRef.current) return;
     if (formInstanceRef.current) return;
@@ -121,11 +119,35 @@ export default function WorkflowFormContent({ data, onBack }) {
       formRef.current.innerHTML = "";
 
       Formio.createForm(formRef.current, formJson)
-        .then((formInstance) => {
-          instance = formInstance;
-          formInstanceRef.current = formInstance;
-        })
-        .catch((err) => console.error("Formio Error:", err));
+       .then((formInstance) => {
+       instance = formInstance;
+       formInstanceRef.current = formInstance;
+
+       if (data?.formData) {
+
+    let parsedData = {};
+
+if (data?.formData) {
+  try {
+    parsedData =
+      typeof data.formData === "string"
+        ? JSON.parse(data.formData)
+        : data.formData;
+  } catch (e) {
+    console.warn("Invalid formData (not JSON):", data.formData);
+    parsedData = {}; 
+    }
+    }
+
+    setTimeout(() => {
+  formInstance.submission = {
+    data: parsedData
+  };
+    }, 0);
+      }
+
+       })
+       .catch((err) => console.error("Formio Error:", err));
     });
 
     return () => {
@@ -133,39 +155,37 @@ export default function WorkflowFormContent({ data, onBack }) {
       if (formRef.current) formRef.current.innerHTML = "";
       formInstanceRef.current = null;
     };
+
   }, [data?.form]);
 
-  //  UI 
   return (
     <div className="workflow-container">
       <div className="workflow-header-row">
         <h2 className="form-title">
-          {data.workflow?.text ||
-            data.workflow?.name ||
-            "Workflow"}
+          {data.workflow?.text || data.workflow?.name || "Workflow"}
         </h2>
       </div>
       <div className="workflow-card">
         <div ref={formRef} />
-<div className="form-actions">
-  <div className="btn-group">
-    <button
-      className="btn btn-save"
-      onClick={handleSave}
-      disabled={saving}
-    >
-      {saving ? "Saving..." : "Save"}
-    </button>
+        <div className="form-actions">
+          <div className="btn-group">
+            <button
+              className="btn btn-save"
+              onClick={handleSave}
+              disabled={saving}
+            >
+              {saving ? "Saving..." : "Save"}
+            </button>
 
-    <button
-      className="btn btn-send"
-      onClick={handleSend}
-      disabled={sending}
-    >
-      {sending ? "Sending..." : "Send"}
-    </button>
-  </div>
-</div>
+            <button
+              className="btn btn-send"
+              onClick={handleSend}
+              disabled={sending}
+            >
+              {sending ? "Sending..." : "Send"}
+            </button>
+          </div>
+        </div>
       </div>
     </div>
   );
