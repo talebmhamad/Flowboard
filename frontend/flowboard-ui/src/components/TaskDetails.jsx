@@ -1,444 +1,335 @@
 import React, { useEffect, useRef, useState } from "react";
+import { useSearchParams } from "react-router-dom";
 import { getTaskDetails } from "../services/taskService";
-import { getDocumentBasicInfo, saveDocument } from "../services/documentService";
-import { getDocumentByTaskId } from "../services/documentService";
+import {
+  getDocumentBasicInfo,
+  getDocumentByTaskId
+} from "../services/documentService";
+
 import { useTask } from "../hooks/useTask";
-import { showSuccess, showError } from "../utils/toast";
+import { showSuccess, showError, showWarning } from "../utils/toast";
 
 export default function TaskDetails({ taskId, task: initialTask, status, onBack }) {
   const [task, setTask] = useState(initialTask || null);
-  const [activeTab, setActiveTab] = useState("task");
+  const [docInfo, setDocInfo] = useState(null);
+  const [docFull, setDocFull] = useState(null);
+
   const formRef = useRef(null);
   const formInstanceRef = useRef(null);
-  const [docInfo, setDocInfo] = useState(null); 
-  const [docFull, setDocFull] = useState(null);
+
   const metaFormRef = useRef(null);
   const metaFormInstanceRef = useRef(null);
+
   const { save, saveAndSend, saving, sending } = useTask();
 
-   useEffect(() => {
-   if (!taskId) return;
+  const [searchParams, setSearchParams] = useSearchParams();
+  const activeTab = searchParams.get("tab") || "task";
 
-  let isMounted = true;
-
-  const loadDetails = async () => {
+  //  SAFE PARSE HELPER
+  const safeParse = (value, fallback = {}) => {
     try {
-      const [taskRes, docRes] = await Promise.all([
-        getTaskDetails(taskId),
-        getDocumentBasicInfo(taskId)
-      ]);
-
-
-      if (!isMounted) return;
-
-      const parsedFormDesigner =
-        typeof taskRes?.formDesigner === "string"
-          ? JSON.parse(taskRes.formDesigner)
-          : taskRes?.formDesigner;
-
-      const parsedFormData =
-        typeof taskRes?.formData === "string" && taskRes.formData
-          ? JSON.parse(taskRes.formData)
-          : taskRes?.formData;
-
-      setTask({
-        ...taskRes,
-        formDesigner: parsedFormDesigner,
-        formData: parsedFormData
-      });
-
-      setDocInfo(docRes);
-
-    } catch (err) {
-      console.error(" Load error:", err);
+      if (!value) return fallback;
+      return typeof value === "string" ? JSON.parse(value) : value;
+    } catch {
+      return fallback;
     }
   };
 
-  loadDetails();
+  //  LOAD DATA
+  useEffect(() => {
+    if (!taskId) return;
 
-   return () => {
-    isMounted = false;
-   };
-   }, [taskId]);
+    let isMounted = true;
 
-   useEffect(() => {
-  if (!task?.formDesigner || !formRef.current || activeTab !== "task") return;
+    const loadDetails = async () => {
+      try {
+        const [taskRes, docRes] = await Promise.all([
+          getTaskDetails(taskId),
+          getDocumentBasicInfo(taskId)
+        ]);
 
-  let isMounted = true;
+        if (!isMounted) return;
 
-  const initForm = async () => {
-    try {
+        setTask({
+          ...taskRes,
+          formDesigner: safeParse(taskRes.formDesigner, {}),
+          formData: safeParse(taskRes.formData, {})
+        });
+
+        setDocInfo(docRes);
+
+      } catch (err) {
+        console.error(err);
+      }
+    };
+
+    loadDetails();
+
+    return () => { isMounted = false };
+  }, [taskId]);
+
+    //  INIT MAIN FORM
+  useEffect(() => {
+    if (!task?.formDesigner || !formRef.current || activeTab !== "task") return;
+    let isMounted = true;
+
+    const init = async () => {
       const FormioModule = await import("formiojs");
-      const Formio = FormioModule.Formio || FormioModule.default?.Formio;
+      const Formio = FormioModule.Formio;
 
       if (!isMounted) return;
 
-      if (formInstanceRef.current) {
-        formInstanceRef.current.destroy(true);
-        formInstanceRef.current = null;
-      }
-
-      const formJson =
-        typeof task.formDesigner === "string"
-          ? JSON.parse(task.formDesigner)
-          : task.formDesigner;
-
+      formInstanceRef.current?.destroy(true);
       formRef.current.innerHTML = "";
 
-      const formInstance = await Formio.createForm(formRef.current, formJson);
+      const form = await Formio.createForm(formRef.current, task.formDesigner);
 
-      if (!isMounted) return;
+      formInstanceRef.current = form;
 
-      formInstanceRef.current = formInstance;
-
-      let safeData = {};
-
-      if (task.formData) {
-        safeData =
-          typeof task.formData === "string"
-            ? JSON.parse(task.formData)
-            : task.formData;
-      }
-
-      formInstance.submission = {
-        data: safeData,
+      form.submission = {
+        data: task.formData || {}
       };
+    };
 
-    } catch (err) {
-      console.error("❌ Form init error:", err);
-    }
-  };
+    init();
 
-  initForm();
+    return () => {
+      isMounted = false;
+      formInstanceRef.current?.destroy(true);
+    };
 
-  return () => {
+  }, [task?.formDesigner, activeTab]);
 
-    isMounted = false;
-
-    if (formInstanceRef.current) {
-      formInstanceRef.current.destroy(true);
-      formInstanceRef.current = null;
-    }
-
-    if (formRef.current) {
-      formRef.current.innerHTML = "";
-    }
-  };
-
-   }, [task?.formDesigner, activeTab]);
-
-   useEffect(() => {
+  //  LOAD META
+  useEffect(() => {
     if (activeTab !== "meta" || !taskId || docFull) return;
 
-  let isMounted = true;
+    let isMounted = true;
 
-  const loadMeta = async () => {
-    try {
-      const res = await getDocumentByTaskId(taskId);
-      if (!isMounted) return;
+    const loadMeta = async () => {
+      try {
+        const res = await getDocumentByTaskId(taskId);
 
-      const parsedDesigner =
-        typeof res.formDesigner === "string"
-          ? JSON.parse(res.formDesigner)
-          : res.formDesigner;
+        if (!isMounted) return;
 
-      const parsedData =
-        typeof res.formData === "string" && res.formData
-          ? JSON.parse(res.formData)
-          : res.formData;
+        setDocFull({
+          ...res,
+          formDesigner: safeParse(res.formDesigner, {}),
+          formData: safeParse(res.formData, {})
+        });
 
-      setDocFull({
-        ...res,
-        formDesigner: parsedDesigner,
-        formData: parsedData
-      });
-
-    } catch (err) {
-      console.error("🔥 Meta load error:", err);
-    }
-  };
+      } catch (err) {
+        console.error(err);
+      }
+    };
 
     loadMeta();
 
-    return () => {
-    isMounted = false;
-  };
+    return () => { isMounted = false };
+  }, [activeTab, taskId]);
 
-   }, [activeTab, taskId, docFull]);
+  //  INIT META FORM
+  useEffect(() => {
+    if (!docFull?.formDesigner || !metaFormRef.current || activeTab !== "meta") return;
 
-   useEffect(() => {
-  if (!docFull?.formDesigner || !metaFormRef.current || activeTab !== "meta") return;
+    let isMounted = true;
 
-  let isMounted = true;
-
-  const initMetaForm = async () => {
-    try {
+    const init = async () => {
       const FormioModule = await import("formiojs");
-      const Formio = FormioModule.Formio || FormioModule.default?.Formio;
+      const Formio = FormioModule.Formio;
 
       if (!isMounted) return;
-
-      // destroy old
-      if (metaFormInstanceRef.current) {
-        metaFormInstanceRef.current.destroy(true);
-        metaFormInstanceRef.current = null;
-      }
 
       metaFormRef.current.innerHTML = "";
 
-      const form = await Formio.createForm(
-       metaFormRef.current,
-       docFull.formDesigner,
-      {
-      readOnly: true 
-      }
-      );
-
-      if (!isMounted) return;
-
-      metaFormInstanceRef.current = form;
+      const form = await Formio.createForm(metaFormRef.current, docFull.formDesigner, {
+        readOnly: true
+      });
 
       form.submission = {
         data: docFull.formData || {}
       };
+    };
 
-    } catch (err) {
-      console.error("❌ Meta form error:", err);
-    }
-  };
+    init();
 
-  initMetaForm();
+    return () => { isMounted = false };
+  }, [docFull, activeTab]);
 
-  return () => {
-    isMounted = false;
-
-    if (metaFormInstanceRef.current) {
-      metaFormInstanceRef.current.destroy(true);
-      metaFormInstanceRef.current = null;
-    }
-
-    if (metaFormRef.current) {
-      metaFormRef.current.innerHTML = "";
-    }
-  };
-
-   }, [docFull, activeTab]);
-
-   if (!task) {
-    return (
-      <div className="d-flex justify-content-center align-items-center p-5" style={{ minHeight: "300px" }}>
-        <div className="spinner-border text-primary"></div>
-      </div>
-    );
-   }
-
-   const handleSave = async () => {
-  if (saving || sending) return;
-
+//  ACTIONS
+const handleSave = async () => {
   try {
-    const formData = formInstanceRef.current?.submission?.data || {};
+    const data = formInstanceRef.current?.submission?.data || {};
 
     await save({
       id: task.id,
       rowVersion: task.rowVersion,
-      formData
+      formData: data
     });
 
     showSuccess("Saved successfully!");
+
+    // optional delay (prevents instant UI changes killing toast)
+    await new Promise((res) => setTimeout(res, 300));
+
   } catch (err) {
-    console.error(err);
+    console.error("Save error:", err);
     showError("Save failed");
   }
-   };
+};
 
-   const handleSend = async () => {
-   if (saving || sending) return;
-
+const handleSend = async () => {
   try {
-     const form = formInstanceRef.current;
+    const form = formInstanceRef.current;
 
-     if (!form) {
-      showError("Form not initialized");
+    if (!form) {
+      showError("Form not ready");
       return;
-     }
+    }
 
-     const isValid = await form.checkValidity(null, true);
-     if (!isValid) {
-      showWarning("Please complete all required fields");
+    const isValid = await form.checkValidity(null, true);
+
+    if (!isValid) {
+      showWarning("Complete required fields");
       return;
-     }
+    }
 
-     const formData = form.submission?.data || {};
+    const data = form.submission?.data || {};
 
-     await saveAndSend({
+    await saveAndSend({
       id: task.id,
       rowVersion: task.rowVersion,
-      formData
-     });
+      formData: data
+    });
 
-     showSuccess("Sent successfully!");
- 
-     setTimeout(() => onBack?.(), 800);
+    showSuccess("Sent successfully!");
 
-     } 
-     catch (err) {
-      console.error(err);
-      showError("Send failed");
-     }
+    // 🔥 IMPORTANT: delay before navigation
+    setTimeout(() => {
+      onBack?.();
+    }, 800);
 
-   };
+  } catch (err) {
+    console.error("Send error:", err);
+    showError("Send failed");
+  }
+};
 
-   return (
-  <div className="container-fluid py-4">
+  if (!task) {
+    return <div className="spinner-border text-primary m-5"></div>;
+  }
 
-    {!task && (
-      <div className="text-center py-5">
-        <div className="spinner-border text-primary" />
-        <p className="mt-2 text-muted">Loading task...</p>
-      </div>
-    )}
+  return (
+    <div className="container-fluid py-4">
 
-    {task && (
-      <>
-         {/* HEADER */}
-        <div className="d-flex justify-content-between align-items-start mb-4">
+      <div className="d-flex justify-content-between align-items-start mb-4">
         <div>
-    <nav>
-      <ol className="breadcrumb mb-1">
-        <li className="breadcrumb-item text-muted small">
-          {docInfo?.documentTypeName || task?.documentType || "-"}
-        </li>
-        <li className="breadcrumb-item active small">
-          {docInfo?.referenceNumber || task?.referenceNumber || "-"}
-        </li>
-      </ol>
-    </nav>
+          <nav>
+            <ol className="breadcrumb mb-1">
+              <li className="breadcrumb-item small text-muted">
+                {docInfo?.documentTypeName || task.documentType}
+              </li>
+              <li className="breadcrumb-item active small">
+                {docInfo?.referenceNumber || task.referenceNumber}
+              </li>
+            </ol>
+          </nav>
 
-    <h3 className="fw-bold mb-0 d-flex align-items-center">
-      {docInfo?.referenceNumber || task?.referenceNumber || "-"}
+          <h3 className="fw-bold">
+            {docInfo?.referenceNumber || task.referenceNumber}
+            <span className="badge bg-success-subtle text-success ms-3">
+              {status?.label}
+            </span>
+          </h3>
 
-      <span className="badge bg-success-subtle text-success border ms-3">
-        {status?.label}
-      </span>
-    </h3>
-
-    <p className="text-muted small mt-1">
-      Created by:{" "}
-      <span className="fw-bold text-dark">
-        {docInfo?.createdByUser || task?.createdByUser || "-"}
-      </span>
-    </p>
+          <p className="text-muted small">
+            Created by: {docInfo?.createdByUser}
+          </p>
         </div>
 
         <button className="btn btn-outline-secondary btn-sm" onClick={onBack}>
-    <i className="bi bi-arrow-left me-2"></i> Back
+          ← Back
         </button>
+      </div>
+
+      <div className="card shadow-sm border-0">
+
+        <div className="card-header bg-white">
+          <ul className="nav nav-tabs">
+            <li className="nav-item">
+              <button
+                className={`nav-link ${activeTab === "task" ? "active fw-bold border-primary border-3" : ""}`}
+                onClick={() => setSearchParams({ tab: "task" })}
+              >
+                My Task
+              </button>
+            </li>
+
+            <li className="nav-item">
+              <button
+                className={`nav-link ${activeTab === "meta" ? "active fw-bold border-primary border-3" : ""}`}
+                onClick={() => setSearchParams({ tab: "meta" })}
+              >
+                Application Metadata
+              </button>
+            </li>
+          </ul>
         </div>
 
-        <div className="card shadow-sm border-0 overflow-hidden">
+        <div className="card-body">
 
-        <div className="card-header bg-white pt-3 px-4">
-            <ul className="nav nav-tabs">
-              <li className="nav-item">
-                <button
-                  className={`nav-link ${
-                    activeTab === "task"
-                      ? "active fw-bold border-bottom border-primary border-3"
-                      : "text-muted"
-                  }`}
-                  onClick={() => setActiveTab("task")}
-                >
-                  My Task
-                </button>
-              </li>
-
-              <li className="nav-item">
-                <button
-                  className={`nav-link ${
-                    activeTab === "meta"
-                      ? "active fw-bold border-bottom border-primary border-3"
-                      : "text-muted"
-                  }`}
-                  onClick={() => setActiveTab("meta")}
-                >
-                  Application Metadata
-                </button>
-              </li>
-            </ul>
-        </div>
-
-        <div className="card-body p-4">
-            {activeTab === "task" && (
-              <>
-                <div className="row g-3 mb-4 p-3 bg-light rounded border">
-                  <div className="col-md-4">
-                    <label className="text-muted small">Document Created</label>
-                    <div>{task.documentCreatedDate || "-"}</div>
-                  </div>
-
-                  <div className="col-md-4">
-                    <label className="text-muted small">Task Date</label>
-                    <div>{task.taskDate || "-"}</div>
-                  </div>
-
-                  <div className="col-md-4">
-                    <label className="text-muted small">Due Date</label>
-                    <div className={task.dueDate ? "text-danger" : ""}>
-                      {task.dueDate || "No deadline"}
-                    </div>
-                  </div>
+          {activeTab === "task" && (
+            <>
+              <div className="row g-3 mb-3 p-3 bg-light rounded border">
+                <div className="col-md-4">
+                  <label className="small text-muted">Document Created</label>
+                  <div>{task.documentCreatedDate}</div>
                 </div>
-                <div className="p-3 border rounded bg-white">
-                  {!task.formDesigner ? (
-                    <p className="text-muted text-center">
-                      No form available
-                    </p>
-                  ) : (
-                    <div ref={formRef} />
-                  )}
+                <div className="col-md-4">
+                  <label className="small text-muted">Task Date</label>
+                  <div>{task.taskDate}</div>
                 </div>
-                <div className="card-footer">
-                  <div className="form-actions">
-                   <div className="btn-group">
+                <div className="col-md-4">
+                  <label className="small text-muted">Due Date</label>
+                  <div className="text-danger">{task.dueDate || "No deadline"}</div>
+                </div>
+              </div>
+
+              <div className="p-3 border rounded bg-white">
+                <div ref={formRef}></div>
+              </div>
+
+        <div className="form-actions">
+          <div className="btn-group">
 <button
-  className="btn btn-primary"
+  className="btn btn-success" 
   onClick={handleSave}
-  disabled={saving || sending}
+  disabled={saving}
 >
   {saving ? "Saving..." : "Save"}
 </button>
 
 <button
-  className="btn btn-success"
+  className="btn btn-primary" 
   onClick={handleSend}
-  disabled={saving || sending}
+  disabled={sending}
 >
   {sending ? "Sending..." : "Send"}
 </button>
+          </div>
+        </div>
 
-                     </div>
-                  </div>
-               </div>
+            </>
+          )}
 
-              </>
-            )}
+          {activeTab === "meta" && (
+            <div className="p-3 border rounded bg-white">
+              <div ref={metaFormRef}></div>
+            </div>
+          )}
 
-           {activeTab === "meta" && (
-  <>
-    <div className="p-3 border rounded bg-white">
-      {!docFull?.formDesigner ? (
-        <p className="text-muted text-center">No metadata form</p>
-      ) : (
-        <div ref={metaFormRef}></div>
-      )}
+        </div>
+      </div>
     </div>
-  </>
-            )}
-        </div>
-
-        </div>
-      </>
-    )}
-  </div>
-);
+  );
 }

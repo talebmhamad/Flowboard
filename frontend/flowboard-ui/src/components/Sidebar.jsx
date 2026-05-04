@@ -1,13 +1,25 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import "../styles/sidebar.css";
 import { useAppContext } from "../context/AppContext";
+import { useNavigate } from "react-router-dom";
 
 export default function Sidebar({
   activeTab,
-  setActiveTab,
   user
 }) {
-  const [isCollapsed, setIsCollapsed] = useState(false);
+  const navigate = useNavigate();
+  const { summary } = useAppContext();
+
+  //  Persist sidebar state
+  const [isCollapsed, setIsCollapsed] = useState(() => {
+    const saved = localStorage.getItem("sidebarCollapsed");
+    return saved === "true"; // convert string → boolean
+  });
+
+  //  Save state on change
+  useEffect(() => {
+    localStorage.setItem("sidebarCollapsed", isCollapsed);
+  }, [isCollapsed]);
 
   // Safe counts
   const getCounts = (key) => ({
@@ -22,8 +34,6 @@ export default function Sidebar({
     { key: "draft", label: "Drafts", icon: "bi-file-earmark-diff-fill" }
   ];
 
-  const { summary } = useAppContext();
-
   return (
     <aside className={`sidebar ${isCollapsed ? "collapsed" : ""}`}>
       
@@ -36,7 +46,7 @@ export default function Sidebar({
 
         <button
           className="toggle-btn"
-          onClick={() => setIsCollapsed(!isCollapsed)}
+          onClick={() => setIsCollapsed(prev => !prev)}
         >
           <i
             className={`bi ${
@@ -57,7 +67,7 @@ export default function Sidebar({
               className={`nav-item ${
                 activeTab === item.key ? "active" : ""
               }`}
-              onClick={() => setActiveTab(item.key)} 
+              onClick={() => navigate(`/dashboard/${item.key}`)}
               title={isCollapsed ? item.label : ""}
             >
               <div className="nav-icon-box">

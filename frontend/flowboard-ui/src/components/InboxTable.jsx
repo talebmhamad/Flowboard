@@ -1,13 +1,20 @@
 import React, { useEffect, useState } from "react";
 import DataTableModule from "react-data-table-component";
+import { useNavigate } from "react-router-dom";
+
 import { getActiveTasks } from "../services/taskService";
 import TaskFilters from "./TaskFilters";
 import "../styles/Inbox.css";
 import { useStatuses } from "../hooks/useStatuses";
-import TaskDetails from "./TaskDetails"; 
+import { useOutletContext } from "react-router-dom";
 
-export default function InboxTable({ documentTypes = [] }) {
+export default function InboxTable() {
   const DataTable = DataTableModule.default;
+
+  const navigate = useNavigate();
+
+  //  get workflows from context (routing)
+  const { workflows = [] } = useOutletContext();
 
   const [tasks, setTasks] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -16,8 +23,6 @@ export default function InboxTable({ documentTypes = [] }) {
   const [page, setPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);
   const [totalRows, setTotalRows] = useState(0);
-
-  const [selectedTask, setSelectedTask] = useState(null);
 
   const initialFormState = {
     refNumber: "",
@@ -110,7 +115,8 @@ export default function InboxTable({ documentTypes = [] }) {
     loadInbox(formState, p, newSize);
   };
 
-  const docTypeOptions = documentTypes.map((wf) => ({
+  //  FIX: use workflows instead of props
+  const docTypeOptions = (workflows || []).map((wf) => ({
     value: wf.id,
     label: wf.text,
   }));
@@ -125,8 +131,9 @@ export default function InboxTable({ documentTypes = [] }) {
     statusOptions.map((s) => [s.value, s])
   );
 
+  //  NEW: ROUTING instead of state
   const handleEdit = (row) => {
-    setSelectedTask(row);
+    navigate(`/dashboard/form/task/${row.id}`);
   };
 
   const columns = [
@@ -184,19 +191,9 @@ export default function InboxTable({ documentTypes = [] }) {
     },
   ];
 
-  if (selectedTask) {
-    return (
-      <TaskDetails
-        taskId={selectedTask.id} 
-        task={selectedTask}      
-        status={statusMap[selectedTask.status]}
-        onBack={() => setSelectedTask(null)}
-      />
-    );
-  }
-
   return (
     <div className="inbox-container">
+
       <TaskFilters
         formState={formState}
         handleInputChange={handleInputChange}

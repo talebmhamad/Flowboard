@@ -1,11 +1,19 @@
 import React, { useEffect, useState } from "react";
 import DataTableModule from "react-data-table-component";
+import { useOutletContext, useNavigate } from "react-router-dom";
+
 import { getDraftTasks } from "../services/taskService";
 import TaskFilters from "./TaskFilters";
+
 import "../styles/Inbox.css";
 
-export default function DraftTable({ documentTypes, onOpenDraft }) {
+export default function DraftTable() {
   const DataTable = DataTableModule.default;
+
+  const navigate = useNavigate();
+
+  //  get workflows from routing context
+  const { workflows = [] } = useOutletContext();
 
   const [tasks, setTasks] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -23,6 +31,7 @@ export default function DraftTable({ documentTypes, onOpenDraft }) {
 
   const [formState, setFormState] = useState(initialFormState);
 
+  // 🔥 Load data on mount
   useEffect(() => {
     loadDraft(initialFormState, 1, pageSize);
   }, []);
@@ -50,6 +59,7 @@ export default function DraftTable({ documentTypes, onOpenDraft }) {
 
       setTasks(res.data || []);
       setTotalRows(res.recordsFiltered || 0);
+
     } catch (err) {
       console.error("Draft error:", err);
     } finally {
@@ -57,6 +67,7 @@ export default function DraftTable({ documentTypes, onOpenDraft }) {
     }
   };
 
+  //  Filters handlers
   const handleInputChange = (e) => {
     const { name, value } = e.target;
 
@@ -73,6 +84,7 @@ export default function DraftTable({ documentTypes, onOpenDraft }) {
 
   const handleClear = () => {
     setFormState(initialFormState);
+    setPage(1);
     loadDraft(initialFormState, 1, pageSize);
   };
 
@@ -86,47 +98,54 @@ export default function DraftTable({ documentTypes, onOpenDraft }) {
     loadDraft(formState, p, newSize);
   };
 
-  const docTypeOptions = documentTypes.map((wf) => ({
+  //  Safe mapping
+  const docTypeOptions = (workflows || []).map((wf) => ({
     value: wf.id,
     label: wf.text,
   }));
 
-const columns = [
-  {
-    name: "Document Type",
-    selector: row => row.documentType,
-    sortable: true,
-  },
-  {
-    name: "Created Date",
-    selector: row => row.createdDate,
-    sortable: true,
-  },
-  {
-    name: "Modified Date",
-    selector: row => row.modifiedDate || "-",
-    sortable: true,
-  },
-  {
-    name: "",
-    width: "80px",
-    cell: row => (
-<button
-  className="btn btn-sm btn-outline-primary"
-  onClick={() => onOpenDraft(row)}
->
-  <i className="bi bi-pencil"></i>
-</button>
-    ),
-    ignoreRowClick: true,
-    allowOverflow: true,
-    button: true,
-  },
-];
+  //  Columns
+  const columns = [
+    {
+      name: "Document Type",
+      selector: (row) => row.documentType,
+      sortable: true,
+    },
+    {
+      name: "Created Date",
+      selector: (row) => row.createdDate,
+      sortable: true,
+    },
+    {
+      name: "Modified Date",
+      selector: (row) => row.modifiedDate || "-",
+      sortable: true,
+    },
+    {
+      name: "",
+      width: "80px",
+      cell: (row) => (
+        <button
+          className="btn btn-sm btn-outline-primary"
+          onClick={() =>
+            navigate(`/dashboard/form/draft/${row.id}`, {
+              state: { from: "/dashboard/draft" } 
+            })
+          }
+        >
+          <i className="bi bi-pencil"></i>
+        </button>
+      ),
+      ignoreRowClick: true,
+      allowOverflow: true,
+      button: true,
+    },
+  ];
 
   return (
     <div className="inbox-container">
 
+      {/* Filters */}
       <TaskFilters
         formState={formState}
         handleInputChange={handleInputChange}
@@ -137,26 +156,27 @@ const columns = [
         IsDraftTable={true}
       />
 
+      {/* Table */}
       <div className="table-wrapper">
-<DataTable
-  key="draft-table"
-  columns={columns}
-  data={tasks}
-  progressPending={loading && tasks.length === 0}
-  pagination
-  paginationServer
-  paginationTotalRows={totalRows}
-  paginationPerPage={pageSize}
-  onChangePage={handlePageChange}
-  onChangeRowsPerPage={handlePerRowsChange}
-  selectableRows
-  onSelectedRowsChange={(state) =>
-    setSelectedRows(state.selectedRows)
-  }
-  highlightOnHover
-  striped
-  responsive
-/>
+        <DataTable
+          key="draft-table"
+          columns={columns}
+          data={tasks}
+          progressPending={loading && tasks.length === 0}
+          pagination
+          paginationServer
+          paginationTotalRows={totalRows}
+          paginationPerPage={pageSize}
+          onChangePage={handlePageChange}
+          onChangeRowsPerPage={handlePerRowsChange}
+          selectableRows
+          onSelectedRowsChange={(state) =>
+            setSelectedRows(state.selectedRows)
+          }
+          highlightOnHover
+          striped
+          responsive
+        />
       </div>
     </div>
   );

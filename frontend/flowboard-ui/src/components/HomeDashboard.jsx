@@ -1,18 +1,25 @@
 import React from "react";
 import "../styles/dashboard.css";
 import { useAppContext } from "../context/AppContext";
+import { useOutletContext } from "react-router-dom";
 
-const HomeDashboard = ({ workflows, onSelectWorkflow }) => {
+const HomeDashboard = () => {
+
+  //  get data from Outlet
+  const { workflows = [], handleSelectWorkflow } = useOutletContext();
+
+  const { summary } = useAppContext();
+
   const getCounts = (key) => ({
     today: summary?.[key]?.today ?? 0,
     total: summary?.[key]?.total ?? 0
   });
+
   const cards = [
     { key: "inbox", label: "Inbox", icon: "bi-envelope-paper-fill", class: "inbox" },
     { key: "completed", label: "Completed", icon: "bi-check-square-fill", class: "completed" },
     { key: "draft", label: "Drafts", icon: "bi-pencil-square", class: "drafts" }
   ];
-  const { summary } = useAppContext();
 
   return (
     <div className="dashboard-container">
@@ -46,7 +53,7 @@ const HomeDashboard = ({ workflows, onSelectWorkflow }) => {
           <div
             key={wf.id}
             className="workflow-card"
-            onClick={() => onSelectWorkflow(wf)} 
+            onClick={() => handleSelectWorkflow(wf)}
           >
             <div className="workflow-body">
               <div className="wf-icon-box">

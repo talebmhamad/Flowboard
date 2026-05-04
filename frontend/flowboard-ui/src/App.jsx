@@ -11,16 +11,21 @@ import UserDashboard from "./pages/dashboard/UserDashboard";
 // Components
 import ProtectedRoute from "./components/ProtectedRoute";
 
+// Child pages
+import HomeDashboard from "./components/HomeDashboard";
+import InboxTable from "./components/InboxTable";
+import CompleteTable from "./components/CompletedTable";
+import DraftTable from "./components/DraftTable";
+
 function App() {
   return (
-    <AppProvider> 
-      
+    <AppProvider>
       <Routes>
 
         {/* PUBLIC */}
         <Route path="/login" element={<Login />} />
 
-        {/* PROTECTED */}
+        {/* PROTECTED + DASHBOARD */}
         <Route
           path="/dashboard"
           element={
@@ -28,8 +33,22 @@ function App() {
               <UserDashboard />
             </ProtectedRoute>
           }
-        />
+        >
+          {/* Default */}
+          <Route index element={<Navigate to="home" replace />} />
 
+          {/* Main pages */}
+          <Route path="home" element={<HomeDashboard />} />
+          <Route path="inbox" element={<InboxTable />} />
+          <Route path="completed" element={<CompleteTable />} />
+          <Route path="draft" element={<DraftTable />} />
+
+          {/* 🔥 NEW: Unified Form Route */}
+          <Route path="form/:mode/:id?" element={<div />} />
+
+        </Route>
+
+        {/* Redirects */}
         <Route path="/" element={<Navigate to="/dashboard" replace />} />
         <Route path="*" element={<Navigate to="/dashboard" replace />} />
 
@@ -45,7 +64,6 @@ function App() {
         theme="colored"
         limit={3}
       />
-
     </AppProvider>
   );
 }
