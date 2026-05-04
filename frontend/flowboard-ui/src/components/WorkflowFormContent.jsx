@@ -124,28 +124,26 @@ export default function WorkflowFormContent({ data, onBack }) {
        formInstanceRef.current = formInstance;
 
        if (data?.formData) {
+         let parsedData = {};
 
-    let parsedData = {};
+         if (data?.formData) {
+           try {
+             parsedData =
+               typeof data.formData === "string"
+                 ? JSON.parse(data.formData)
+                 : data.formData;
+           } catch (e) {
+             console.warn("Invalid formData (not JSON):", data.formData);
+             parsedData = {}; 
+           }
+         }
 
-if (data?.formData) {
-  try {
-    parsedData =
-      typeof data.formData === "string"
-        ? JSON.parse(data.formData)
-        : data.formData;
-  } catch (e) {
-    console.warn("Invalid formData (not JSON):", data.formData);
-    parsedData = {}; 
-    }
-    }
-
-    setTimeout(() => {
-  formInstance.submission = {
-    data: parsedData
-  };
-    }, 0);
-      }
-
+         setTimeout(() => {
+           formInstance.submission = {
+             data: parsedData
+           };
+         }, 0);
+       }
        })
        .catch((err) => console.error("Formio Error:", err));
     });
@@ -155,7 +153,6 @@ if (data?.formData) {
       if (formRef.current) formRef.current.innerHTML = "";
       formInstanceRef.current = null;
     };
-
   }, [data?.form]);
 
   return (
@@ -164,26 +161,31 @@ if (data?.formData) {
         <h2 className="form-title">
           {data.workflow?.text || data.workflow?.name || "Workflow"}
         </h2>
+        
+        <button className="btn btn-outline-secondary btn-sm" onClick={onBack}>
+    <i className="bi bi-arrow-left me-2"></i> Back
+        </button>
       </div>
+
       <div className="workflow-card">
         <div ref={formRef} />
         <div className="form-actions">
           <div className="btn-group">
-            <button
-              className="btn btn-save"
-              onClick={handleSave}
-              disabled={saving}
-            >
-              {saving ? "Saving..." : "Save"}
-            </button>
+<button
+  className="btn btn-success" 
+  onClick={handleSave}
+  disabled={saving}
+>
+  {saving ? "Saving..." : "Save"}
+</button>
 
-            <button
-              className="btn btn-send"
-              onClick={handleSend}
-              disabled={sending}
-            >
-              {sending ? "Sending..." : "Send"}
-            </button>
+<button
+  className="btn btn-primary" 
+  onClick={handleSend}
+  disabled={sending}
+>
+  {sending ? "Sending..." : "Send"}
+</button>
           </div>
         </div>
       </div>

@@ -10,10 +10,7 @@ import CompleteTable from "../../components/CompletedTable";
 import DraftTable from "../../components/DraftTable";
 import "../../styles/userDashboard.css";
 import { useAppContext } from "../../context/AppContext";
-import { ImageOff } from "lucide-react";
-import { getDocumentBasicInfo } from "../../services/documentService";
 import { getDocumentById } from "../../services/documentService";
-
 
 export default function UserDashboard() {
   const [activeTab, setActiveTab] = useState("home");
@@ -95,11 +92,37 @@ export default function UserDashboard() {
   }
   };
 
-  function DefaultDashboardContent({
-  activeTab,
-  workflows,
-  onSelectWorkflow
-}) {
+  return (
+    <DashboardLayout
+      user={user}
+      activeTab={activeTab}
+      setActiveTab={handleTabChange} 
+      onSelectWorkflow={handleSelectWorkflow}
+    >
+      {loadingForm ? (
+        <div className="dashboard-card">
+          <h2>Loading form...</h2>
+        </div>
+      ) : selectedWorkflow ? (
+        <WorkflowFormContent
+          data={selectedWorkflow}
+          onBack={() => setSelectedWorkflow(null)}
+        />
+      ) : (
+    <DefaultDashboardContent
+      activeTab={activeTab}
+      summary={summary}
+      workflows={workflows}
+      onSelectWorkflow={handleSelectWorkflow}
+      handleOpenDraft={handleOpenDraft}  
+    />
+      )}
+    </DashboardLayout>
+  );
+}
+
+function DefaultDashboardContent({activeTab,workflows,onSelectWorkflow,handleOpenDraft})
+  {
   switch (activeTab) {
     case "home":
       return (
@@ -123,33 +146,5 @@ export default function UserDashboard() {
     default:
       return null;
   }
-}
-
-  return (
-    <DashboardLayout
-      user={user}
-      activeTab={activeTab}
-      setActiveTab={handleTabChange} 
-      onSelectWorkflow={handleSelectWorkflow}
-    >
-      {loadingForm ? (
-        <div className="dashboard-card">
-          <h2>Loading form...</h2>
-        </div>
-      ) : selectedWorkflow ? (
-        <WorkflowFormContent
-          data={selectedWorkflow}
-          onBack={() => setSelectedWorkflow(null)}
-        />
-      ) : (
-        <DefaultDashboardContent
-          activeTab={activeTab}
-          summary={summary}
-          workflows={workflows}
-          onSelectWorkflow={handleSelectWorkflow}
-        />
-      )}
-    </DashboardLayout>
-  );
 }
 

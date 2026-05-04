@@ -110,8 +110,8 @@ namespace Flowboard.Infrastructure.Services
         {
             var content = new MultipartFormDataContent();
 
-            if (!string.IsNullOrEmpty(request.id))
-                content.Add(new StringContent(request.id), "id");
+            if (!string.IsNullOrEmpty(request.Id))
+                content.Add(new StringContent(request.Id), "Id");
 
             if (!string.IsNullOrEmpty(request.rowVersion))
                 content.Add(new StringContent(request.rowVersion), "rowVersion");
@@ -132,8 +132,8 @@ namespace Flowboard.Infrastructure.Services
         {
             var content = new MultipartFormDataContent();
 
-            if (!string.IsNullOrEmpty(request.id))
-                content.Add(new StringContent(request.id), "id");
+            if (!string.IsNullOrEmpty(request.Id))
+                content.Add(new StringContent(request.Id), "Id");
 
             if (!string.IsNullOrEmpty(request.rowVersion))
                 content.Add(new StringContent(request.rowVersion), "rowVersion");

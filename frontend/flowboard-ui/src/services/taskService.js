@@ -122,8 +122,8 @@ export const saveTask = async ({ id, rowVersion, formData }) => {
   try {
     const body = new FormData();
 
-    if (id) body.append("id", id.toString());
-    if (rowVersion) body.append("rowVersion", rowVersion);
+    if (id) body.append("Id", id.toString());
+    if (rowVersion) body.append("rowVersion", null);
 
     body.append("FormData", JSON.stringify(formData));
 
@@ -145,7 +145,7 @@ export const saveAndSendTask = async ({ id, rowVersion, formData }) => {
   try {
     const body = new FormData();
 
-    if (id) body.append("id", id.toString());
+    if (id) body.append("Id", id.toString());
     if (rowVersion) body.append("rowVersion", rowVersion.toString());
 
     body.append("FormData", JSON.stringify(formData));

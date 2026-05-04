@@ -400,20 +400,21 @@ export default function TaskDetails({ taskId, task: initialTask, status, onBack 
                 <div className="card-footer">
                   <div className="form-actions">
                    <div className="btn-group">
-                    <button
-                           className="btn btn-save"
-                           onClick={handleSave}
-                           disabled={saving || sending}
-                           >
-                          {saving ? "Saving..." : "Save"}
-                    </button>
-                    <button
-                           className="btn btn-send"
-                           onClick={handleSend}
-                           disabled={saving || sending}
-                          >
-                           {sending ? "Sending..." : "Send"}
-                    </button>
+<button
+  className="btn btn-primary"
+  onClick={handleSave}
+  disabled={saving || sending}
+>
+  {saving ? "Saving..." : "Save"}
+</button>
+
+<button
+  className="btn btn-success"
+  onClick={handleSend}
+  disabled={saving || sending}
+>
+  {sending ? "Sending..." : "Send"}
+</button>
 
                      </div>
                   </div>
