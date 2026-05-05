@@ -1,4 +1,4 @@
-import { getToken, logout } from "./authStorage";
+import { getToken, clearToken } from "./authStorage";
 
 export const apiFetch = async (url, options = {}) => {
   const token = getToken();
@@ -16,16 +16,27 @@ export const apiFetch = async (url, options = {}) => {
     headers
   });
 
+  //  Handle errors
   if (!response.ok) {
     const errorText = await response.text();
 
-    // Optional: auto logout if unauthorized
-    if (response.status === 401) {
-      logout();
-    }
+if (response.status === 401) {
+  clearToken();             
+  window.location.href = "/login"; 
+}
 
     throw new Error(errorText || "API request failed");
   }
 
-  return response.json();
+  //  FIX STARTS HERE
+  const text = await response.text();
+
+  // If empty response → return null safely
+  if (!text) return null;
+
+  try {
+    return JSON.parse(text);
+  } catch {
+    return text; // fallback if not JSON
+  }
 };

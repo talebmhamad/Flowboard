@@ -6,7 +6,7 @@ import { AppProvider } from "./context/AppContext";
 
 // Pages
 import Login from "./pages/Login";
-import UserDashboard from "./pages/dashboard/UserDashboard";
+import UserDashboard from "./pages/dashboard/Dashboard";
 
 // Components
 import ProtectedRoute from "./components/ProtectedRoute";
@@ -42,8 +42,6 @@ function App() {
           <Route path="inbox" element={<InboxTable />} />
           <Route path="completed" element={<CompleteTable />} />
           <Route path="draft" element={<DraftTable />} />
-
-          {/* 🔥 NEW: Unified Form Route */}
           <Route path="form/:mode/:id?" element={<div />} />
 
         </Route>

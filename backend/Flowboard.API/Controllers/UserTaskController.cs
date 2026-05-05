@@ -37,21 +37,34 @@ public class TasksController : ControllerBase
     [HttpGet("details/{taskId}")]
     public async Task<IActionResult> GetTaskDetails(int taskId)
     {
+        await _service.ViewTaskAsync(taskId);
+
         var result = await _service.GetTaskDetails(taskId);
+
         return Ok(result);
     }
 
     [HttpPost("save")]
     public async Task<IActionResult> SaveTask([FromForm] SaveTaskDto request)
     {
+        await _service.LockTaskAsync(int.Parse(request.Id));
+
         var result = await _service.SaveTaskAsync(request);
+
+        await _service.UnlockTaskAsync(int.Parse(request.Id));
+
         return Ok(result);
     }
 
     [HttpPost("saveandsend")]
     public async Task<IActionResult> SaveAndSendTask([FromForm] SaveTaskDto request)
     {
+        await _service.LockTaskAsync(int.Parse(request.Id));
+
         var result = await _service.SaveAndSendTaskAsync(request);
+
+        await _service.UnlockTaskAsync(int.Parse(request.Id));
+
         return Ok(result);
     }
 

@@ -1,5 +1,5 @@
 import { jwtDecode } from "jwt-decode";
-import { getToken, logout } from "./authStorage";
+import { getToken } from "./authStorage";
 
 export const getUserFromToken = () => {
   const token = getToken();
@@ -9,8 +9,7 @@ export const getUserFromToken = () => {
     const decoded = jwtDecode(token);
 
     if (decoded.exp * 1000 < Date.now()) {
-      logout();
-      return null;
+      return null; // ❌ don't logout here
     }
 
     return {
@@ -19,10 +18,10 @@ export const getUserFromToken = () => {
       fullName: decoded.DisplayName,
       email: decoded.Email,
       role:
-        decoded["http://schemas.microsoft.com/ws/2008/06/identity/claims/role"]
+        decoded["http://schemas.microsoft.com/ws/2008/06/identity/claims/role"],
+      exp: decoded.exp
     };
   } catch (error) {
-    logout();
-    return null;
+    return null; 
   }
 };

@@ -147,5 +147,50 @@ namespace Flowboard.Infrastructure.Services
             return result;
         }
 
+        public async Task<string> ViewTaskAsync(int taskId)
+        {
+            var content = new MultipartFormDataContent();
+            content.Add(new StringContent(taskId.ToString()), "id");
+
+            var response = await _http.PostAsync("Task/View", content);
+
+            var result = await response.Content.ReadAsStringAsync();
+
+            if (!response.IsSuccessStatusCode)
+                throw new Exception($"Portal API Error: {result}");
+
+            return result;
+        }
+
+        public async Task<string> LockTaskAsync(int taskId)
+        {
+            var content = new MultipartFormDataContent();
+            content.Add(new StringContent(taskId.ToString()), "id");
+
+            var response = await _http.PostAsync("Task/Lock", content);
+
+            var result = await response.Content.ReadAsStringAsync();
+
+            if (!response.IsSuccessStatusCode)
+                throw new Exception($"Portal API Error: {result}");
+
+            return result;
+        }
+
+        public async Task<string> UnlockTaskAsync(int taskId)
+        {
+            var content = new MultipartFormDataContent();
+            content.Add(new StringContent(taskId.ToString()), "id");
+
+            var response = await _http.PostAsync("Task/UnLock", content);
+
+            var result = await response.Content.ReadAsStringAsync();
+
+            if (!response.IsSuccessStatusCode)
+                throw new Exception($"Portal API Error: {result}");
+
+            return result;
+        }
+
     }
 }

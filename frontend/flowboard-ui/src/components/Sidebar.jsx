@@ -3,40 +3,65 @@ import "../styles/sidebar.css";
 import { useAppContext } from "../context/AppContext";
 import { useNavigate } from "react-router-dom";
 
-export default function Sidebar({
-  activeTab,
-  user
-}) {
+export default function Sidebar({ activeTab, user }) {
   const navigate = useNavigate();
   const { summary } = useAppContext();
+  const role = user?.role || "User";
 
-  //  Persist sidebar state
   const [isCollapsed, setIsCollapsed] = useState(() => {
     const saved = localStorage.getItem("sidebarCollapsed");
-    return saved === "true"; // convert string → boolean
+    return saved === "true";
   });
 
-  //  Save state on change
   useEffect(() => {
     localStorage.setItem("sidebarCollapsed", isCollapsed);
   }, [isCollapsed]);
 
-  // Safe counts
   const getCounts = (key) => ({
     today: summary?.[key]?.today ?? 0,
     total: summary?.[key]?.total ?? 0
   });
 
   const menu = [
-    { key: "home", label: "Dashboard", icon: "bi-grid-1x2-fill" },
-    { key: "inbox", label: "Inbox", icon: "bi-chat-square-text-fill" },
-    { key: "completed", label: "Completed", icon: "bi-patch-check-all" },
-    { key: "draft", label: "Drafts", icon: "bi-file-earmark-diff-fill" }
+    {
+      key: "home",
+      label: "Dashboard",
+      icon: "bi-grid-1x2-fill",
+      roles: ["User", "Administrator"]
+    },
+    {
+      key: "inbox",
+      label: "Inbox",
+      icon: "bi-chat-square-text-fill",
+      roles: ["User", "Administrator"]
+    },
+    {
+      key: "completed",
+      label: "Completed",
+      icon: "bi-patch-check-all",
+      roles: ["User", "Administrator"]
+    },
+    {
+      key: "draft",
+      label: "Drafts",
+      icon: "bi-file-earmark-diff-fill",
+      roles: ["User", "Administrator"]
+    },
+    {
+      key: "tracking",
+      label: "Tracking",
+      icon: "bi-clipboard-check",
+      roles: ["Administrator"] 
+    }
   ];
+
+  const filteredMenu = menu.filter((item) =>
+    item.roles.includes(role)
+  );
 
   return (
     <aside className={`sidebar ${isCollapsed ? "collapsed" : ""}`}>
-      
+
       {/* HEADER */}
       <div className="sidebar-header">
         <div className="logo-wrapper">
@@ -46,7 +71,7 @@ export default function Sidebar({
 
         <button
           className="toggle-btn"
-          onClick={() => setIsCollapsed(prev => !prev)}
+          onClick={() => setIsCollapsed((prev) => !prev)}
         >
           <i
             className={`bi ${
@@ -58,7 +83,7 @@ export default function Sidebar({
 
       {/* NAV */}
       <nav className="sidebar-nav">
-        {menu.map((item) => {
+        {filteredMenu.map((item) => {
           const counts = getCounts(item.key);
 
           return (
@@ -110,7 +135,7 @@ export default function Sidebar({
           {!isCollapsed && (
             <div className="user-info">
               <span className="user-name">{user?.fullName}</span>
-              <span className="user-role">Administrator</span>
+              <span className="user-role">{role}</span>
             </div>
           )}
         </div>

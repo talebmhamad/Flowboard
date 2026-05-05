@@ -1,7 +1,7 @@
 import { useEffect, useRef, useCallback } from "react";
 import "../styles/WorkflowForm.css";
 import { useDocument } from "../hooks/useDocument";
-import { toast } from "react-toastify";
+import { showSuccess, showError, showWarning } from "../utils/toast";
 import { useAppContext } from "../context/AppContext";
 import { getUserSummary } from "../services/userService";
 
@@ -21,7 +21,7 @@ export default function WorkflowFormContent({ data, onBack }) {
       const isValid = await form.checkValidity(null, true);
 
       if (!isValid) {
-        toast.error("Please fill all required fields");
+        showError("Please fill all required fields");
         return;
       }
 
@@ -35,7 +35,7 @@ export default function WorkflowFormContent({ data, onBack }) {
         rowVersion: data.rowVersion || "",
       });
 
-      toast.success("Saved successfully!");
+      showSuccess("Saved successfully!");
 
       const newSummary = await getUserSummary();
       setSummary(newSummary);
@@ -45,7 +45,7 @@ export default function WorkflowFormContent({ data, onBack }) {
       }, 800);
     } catch (err) {
       console.error(err);
-      toast.error("Save failed");
+      showError("Save failed");
     }
   }, [data, save, saving]);
 
@@ -73,7 +73,7 @@ export default function WorkflowFormContent({ data, onBack }) {
         rowVersion: data.rowVersion || "",
       });
 
-      toast.success("Sent successfully!");
+      showSuccess("Sent successfully!");
 
       const newSummary = await getUserSummary();
       setSummary(newSummary);
@@ -83,7 +83,7 @@ export default function WorkflowFormContent({ data, onBack }) {
       }, 800);
     } catch (err) {
       console.error(err);
-      toast.error("Send failed");
+      showError("Send failed");
     }
   }, [data, saveAndSend, sending]);
 

@@ -1,31 +1,26 @@
 import React, { useEffect, useRef, useState } from "react";
-import { useSearchParams } from "react-router-dom";
+import { useSearchParams, useLocation } from "react-router-dom";
 import { getTaskDetails } from "../services/taskService";
-import {
-  getDocumentBasicInfo,
-  getDocumentByTaskId
-} from "../services/documentService";
-
+import { getDocumentBasicInfo } from "../services/documentService";
 import { useTask } from "../hooks/useTask";
 import { showSuccess, showError, showWarning } from "../utils/toast";
+import { getUserSummary } from "../services/userService";
+import { useAppContext } from "../context/AppContext";
+import DocumentMetadata from "./DocumentMetadata";
+import Loader from "./Loader";
 
 export default function TaskDetails({ taskId, task: initialTask, status, onBack }) {
   const [task, setTask] = useState(initialTask || null);
   const [docInfo, setDocInfo] = useState(null);
-  const [docFull, setDocFull] = useState(null);
-
   const formRef = useRef(null);
   const formInstanceRef = useRef(null);
-
-  const metaFormRef = useRef(null);
-  const metaFormInstanceRef = useRef(null);
-
   const { save, saveAndSend, saving, sending } = useTask();
-
+  const { setSummary } = useAppContext();
   const [searchParams, setSearchParams] = useSearchParams();
   const activeTab = searchParams.get("tab") || "task";
+  const location = useLocation();
+  const fromRef = useRef(location.state?.from || "/dashboard/inbox");
 
-  //  SAFE PARSE HELPER
   const safeParse = (value, fallback = {}) => {
     try {
       if (!value) return fallback;
@@ -35,7 +30,6 @@ export default function TaskDetails({ taskId, task: initialTask, status, onBack 
     }
   };
 
-  //  LOAD DATA
   useEffect(() => {
     if (!taskId) return;
 
@@ -68,14 +62,13 @@ export default function TaskDetails({ taskId, task: initialTask, status, onBack 
     return () => { isMounted = false };
   }, [taskId]);
 
-    //  INIT MAIN FORM
   useEffect(() => {
     if (!task?.formDesigner || !formRef.current || activeTab !== "task") return;
+
     let isMounted = true;
 
     const init = async () => {
-      const FormioModule = await import("formiojs");
-      const Formio = FormioModule.Formio;
+      const { Formio } = await import("formiojs");
 
       if (!isMounted) return;
 
@@ -97,126 +90,75 @@ export default function TaskDetails({ taskId, task: initialTask, status, onBack 
       isMounted = false;
       formInstanceRef.current?.destroy(true);
     };
-
   }, [task?.formDesigner, activeTab]);
 
-  //  LOAD META
-  useEffect(() => {
-    if (activeTab !== "meta" || !taskId || docFull) return;
+  // 🔹 SAVE
+  const handleSave = async () => {
+    try {
+      const data = formInstanceRef.current?.submission?.data || {};
 
-    let isMounted = true;
-
-    const loadMeta = async () => {
-      try {
-        const res = await getDocumentByTaskId(taskId);
-
-        if (!isMounted) return;
-
-        setDocFull({
-          ...res,
-          formDesigner: safeParse(res.formDesigner, {}),
-          formData: safeParse(res.formData, {})
-        });
-
-      } catch (err) {
-        console.error(err);
-      }
-    };
-
-    loadMeta();
-
-    return () => { isMounted = false };
-  }, [activeTab, taskId]);
-
-  //  INIT META FORM
-  useEffect(() => {
-    if (!docFull?.formDesigner || !metaFormRef.current || activeTab !== "meta") return;
-
-    let isMounted = true;
-
-    const init = async () => {
-      const FormioModule = await import("formiojs");
-      const Formio = FormioModule.Formio;
-
-      if (!isMounted) return;
-
-      metaFormRef.current.innerHTML = "";
-
-      const form = await Formio.createForm(metaFormRef.current, docFull.formDesigner, {
-        readOnly: true
+      await save({
+        id: task.id,
+        rowVersion: task.rowVersion,
+        formData: data
       });
 
-      form.submission = {
-        data: docFull.formData || {}
-      };
-    };
+      showSuccess("Saved successfully!");
 
-    init();
+      const newSummary = await getUserSummary();
+      setSummary(newSummary);
 
-    return () => { isMounted = false };
-  }, [docFull, activeTab]);
+      setTimeout(() => {
+        onBack?.(fromRef.current); // 🔥 FIX HERE
+      }, 800);
 
-//  ACTIONS
-const handleSave = async () => {
-  try {
-    const data = formInstanceRef.current?.submission?.data || {};
-
-    await save({
-      id: task.id,
-      rowVersion: task.rowVersion,
-      formData: data
-    });
-
-    showSuccess("Saved successfully!");
-
-    // optional delay (prevents instant UI changes killing toast)
-    await new Promise((res) => setTimeout(res, 300));
-
-  } catch (err) {
-    console.error("Save error:", err);
-    showError("Save failed");
-  }
-};
-
-const handleSend = async () => {
-  try {
-    const form = formInstanceRef.current;
-
-    if (!form) {
-      showError("Form not ready");
-      return;
+    } catch (err) {
+      console.error("Save error:", err);
+      showError("Save failed");
     }
+  };
 
-    const isValid = await form.checkValidity(null, true);
+  const handleSend = async () => {
+    try {
+      const form = formInstanceRef.current;
 
-    if (!isValid) {
-      showWarning("Complete required fields");
-      return;
+      if (!form) {
+        showError("Form not ready");
+        return;
+      }
+
+      const isValid = await form.checkValidity(null, true);
+
+      if (!isValid) {
+        showWarning("Complete required fields");
+        return;
+      }
+
+      const data = form.submission?.data || {};
+
+      await saveAndSend({
+        id: task.id,
+        rowVersion: task.rowVersion,
+        formData: data
+      });
+
+      showSuccess("Sent successfully!");
+
+      const newSummary = await getUserSummary();
+      setSummary(newSummary);
+
+      setTimeout(() => {
+        onBack?.(fromRef.current); 
+      }, 800);
+
+    } catch (err) {
+      console.error("Send error:", err);
+      showError("Send failed");
     }
-
-    const data = form.submission?.data || {};
-
-    await saveAndSend({
-      id: task.id,
-      rowVersion: task.rowVersion,
-      formData: data
-    });
-
-    showSuccess("Sent successfully!");
-
-    // 🔥 IMPORTANT: delay before navigation
-    setTimeout(() => {
-      onBack?.();
-    }, 800);
-
-  } catch (err) {
-    console.error("Send error:", err);
-    showError("Send failed");
-  }
-};
+  };
 
   if (!task) {
-    return <div className="spinner-border text-primary m-5"></div>;
+    return <Loader text="Loading data..." />;
   }
 
   return (
@@ -247,13 +189,15 @@ const handleSend = async () => {
           </p>
         </div>
 
-        <button className="btn btn-outline-secondary btn-sm" onClick={onBack}>
+        <button
+          className="btn btn-outline-secondary btn-sm"
+          onClick={() => onBack?.(fromRef.current)} 
+        >
           ← Back
         </button>
       </div>
 
       <div className="card shadow-sm border-0">
-
         <div className="card-header bg-white">
           <ul className="nav nav-tabs">
             <li className="nav-item">
@@ -299,33 +243,22 @@ const handleSend = async () => {
                 <div ref={formRef}></div>
               </div>
 
-        <div className="form-actions">
-          <div className="btn-group">
-<button
-  className="btn btn-success" 
-  onClick={handleSave}
-  disabled={saving}
->
-  {saving ? "Saving..." : "Save"}
-</button>
+              <div className="form-actions">
+                <div className="btn-group">
+                  <button className="btn btn-success" onClick={handleSave} disabled={saving}>
+                    {saving ? "Saving..." : "Save"}
+                  </button>
 
-<button
-  className="btn btn-primary" 
-  onClick={handleSend}
-  disabled={sending}
->
-  {sending ? "Sending..." : "Send"}
-</button>
-          </div>
-        </div>
-
+                  <button className="btn btn-primary" onClick={handleSend} disabled={sending}>
+                    {sending ? "Sending..." : "Send"}
+                  </button>
+                </div>
+              </div>
             </>
           )}
 
           {activeTab === "meta" && (
-            <div className="p-3 border rounded bg-white">
-              <div ref={metaFormRef}></div>
-            </div>
+            <DocumentMetadata taskId={taskId} />
           )}
 
         </div>

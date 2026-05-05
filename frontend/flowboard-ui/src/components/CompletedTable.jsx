@@ -1,11 +1,10 @@
 import React, { useEffect, useState } from "react";
 import DataTableModule from "react-data-table-component";
 import { getCompletedTasks } from "../services/taskService";
-import { getStatuses } from "../services/statusService";
 import TaskFilters from "./TaskFilters";
 import "../styles/Inbox.css";
 import { useStatuses } from "../hooks/useStatuses";
-import { Rows } from "lucide-react";
+import DocumentMetadata from "./DocumentMetadata"; // 🔥 NEW
 
 export default function CompletedTable({ documentTypes = [] }) {
   const DataTable = DataTableModule.default;
@@ -16,8 +15,8 @@ export default function CompletedTable({ documentTypes = [] }) {
   const [page, setPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);
   const [totalRows, setTotalRows] = useState(0);
-
-  const { statuses, loading: statusesLoading } = useStatuses();
+  const { statuses } = useStatuses();
+  const [selectedTaskId, setSelectedTaskId] = useState(null);
 
   const initialFormState = {
     refNumber: "",
@@ -42,12 +41,9 @@ export default function CompletedTable({ documentTypes = [] }) {
         start: (pageNumber - 1) * size,
         length: size,
         nodeId: 3,
-
         documentTypeId: filters.docType?.value || 0,
         statusId: filters.status?.value || 0,
-
         referenceNumber: filters.refNumber || "",
-
         fromDate: filters.fromDate
           ? new Date(filters.fromDate).toISOString()
           : null,
@@ -109,42 +105,95 @@ export default function CompletedTable({ documentTypes = [] }) {
   }));
 
   const statusMap = Object.fromEntries(
-   statusOptions.map(s => [s.value, s])
+    statusOptions.map((s) => [s.value, s])
   );
 
-const columns = [
-  {
-    name: "Document Type",
-    selector: (row) => row.documentType || "N/A",
-    sortable: true, 
-  },
-  {
-    name: "Reference Number",
-    selector: (row) => row.referenceNumber || "---",
-    sortable: true,
-  },
-  {
-    name: "Task Date",
-    selector: (row) => row.taskDate || "-",
-    sortable: true,
-  },
-  {
-    name: "Owner",
-    selector: (row) => row.createdByUser || "-",
-    sortable: true,
-  },
-  {
-    name: "Created Date",
-    selector: (row) => row.createdDate || "-",
-    sortable: true,
-  },
-  { name: "Status", cell: (row) => { const status = statusMap[row.status]; return ( <span className="status-badge" style={{ backgroundColor: status?.color || "#ccc", color: "#fff" }} > {status?.label || "Unknown"} </span> ); }, }
+  // 🔥 UPDATED COLUMNS
+  const columns = [
+    {
+      name: "Document Type",
+      selector: (row) => row.documentType || "N/A",
+      sortable: true,
+    },
+    {
+      name: "Reference Number",
+      selector: (row) => row.referenceNumber || "---",
+      sortable: true,
+    },
+    {
+      name: "Task Date",
+      selector: (row) => row.taskDate || "-",
+      sortable: true,
+    },
+    {
+      name: "Owner",
+      selector: (row) => row.createdByUser || "-",
+      sortable: true,
+    },
+    {
+      name: "Created Date",
+      selector: (row) => row.createdDate || "-",
+      sortable: true,
+    },
+    {
+      name: "Status",
+      cell: (row) => {
+        const status = statusMap[row.status];
+        return (
+          <span
+            className="status-badge"
+            style={{
+              backgroundColor: status?.color || "#ccc",
+              color: "#fff",
+            }}
+          >
+            {status?.label || "Unknown"}
+          </span>
+        );
+      },
+    },
+    {
+      name: "",
+      width: "80px",
+      cell: (row) => (
+        <button
+          className="btn btn-sm btn-outline-primary"
+          onClick={() => setSelectedTaskId(row.id)}
+        >
+          <i className="bi bi-eye"></i>
+        </button>
+      ),
+      ignoreRowClick: true,
+      allowOverflow: true,
+      button: true,
+    },
+  ];
 
-];
+  if (selectedTaskId) {
+    return (
+      <div className="inbox-container">
+
+        <div className="d-flex justify-content-between mb-3">
+          <h5>Application Metadata</h5>
+
+          <button
+            className="btn btn-outline-secondary btn-sm"
+            onClick={() => setSelectedTaskId(null)}
+          >
+            ← Back
+          </button>
+        </div>
+
+        <DocumentMetadata taskId={selectedTaskId} />
+      </div>
+    );
+  }
 
   return (
     <div className="inbox-container">
+
       <TaskFilters
+        storageKey="completedFilters"
         formState={formState}
         handleInputChange={handleInputChange}
         handleSearch={handleSearch}

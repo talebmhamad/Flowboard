@@ -123,7 +123,7 @@ export const saveTask = async ({ id, rowVersion, formData }) => {
     const body = new FormData();
 
     if (id) body.append("Id", id.toString());
-    if (rowVersion) body.append("rowVersion", null);
+    if (rowVersion) body.append("rowVersion", rowVersion);
 
     body.append("FormData", JSON.stringify(formData));
 

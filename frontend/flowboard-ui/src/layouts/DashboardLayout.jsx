@@ -1,6 +1,7 @@
 import Sidebar from "../components/Sidebar";
 import "../styles/dashboardLayout.css";
-import { logout } from "../utils/authStorage";
+import { useLogin } from "../hooks/useAuth"; 
+import { useNavigate } from "react-router-dom";
 
 export default function DashboardLayout({
   children,
@@ -9,6 +10,14 @@ export default function DashboardLayout({
   summary,
   onSelectWorkflow
 }) {
+  const { logoutUser } = useLogin();
+  const navigate = useNavigate();
+
+  const handleLogout = () => {
+    logoutUser();       // ✅ clean
+    navigate("/login"); // ✅ SPA redirect
+  };
+
   return (
     <div className="layout">
       <Sidebar 
@@ -24,7 +33,9 @@ export default function DashboardLayout({
             <i className="bi bi-layout-text-sidebar-reverse breadcrumb-icon"></i>
             <div className="header-title-group">
               <h2 className="page-title">
-                {activeTab ? activeTab.charAt(0).toUpperCase() + activeTab.slice(1) : "Dashboard"}
+                {activeTab
+                  ? activeTab.charAt(0).toUpperCase() + activeTab.slice(1)
+                  : "Dashboard"}
               </h2>
               <p className="page-subtitle">Overview of your applications</p>
             </div>
@@ -38,17 +49,17 @@ export default function DashboardLayout({
 
             <div className="header-actions">
               <div className="user-pill">
-                <span className="user-name">{user?.fullName || "Administrator"}</span>
+                <span className="user-name">
+                  {user?.fullName || "Administrator"}
+                </span>
+
                 <span className="user-avatar-small">
                   {user?.fullName?.charAt(0)}
                 </span>
 
-                <button 
-                  className="logout-pill-btn" 
-                  onClick={() => {
-                    logout();
-                    window.location.href = "/login";
-                  }}
+                <button
+                  className="logout-pill-btn"
+                  onClick={handleLogout}
                   title="Logout"
                 >
                   <i className="bi bi-box-arrow-right"></i>
@@ -58,9 +69,7 @@ export default function DashboardLayout({
           </div>
         </header>
 
-        <main className="layout-main">
-          {children}
-        </main>
+        <main className="layout-main">{children}</main>
       </div>
     </div>
   );

@@ -133,7 +133,9 @@ export default function InboxTable() {
 
   //  NEW: ROUTING instead of state
   const handleEdit = (row) => {
-    navigate(`/dashboard/form/task/${row.id}`);
+    navigate(`/dashboard/form/task/${row.id}`, {
+    state: { from: "/dashboard/inbox" }
+    });
   };
 
   const columns = [
@@ -194,16 +196,17 @@ export default function InboxTable() {
   return (
     <div className="inbox-container">
 
-      <TaskFilters
-        formState={formState}
-        handleInputChange={handleInputChange}
-        handleSearch={handleSearch}
-        handleClear={handleClear}
-        docTypeOptions={docTypeOptions}
-        statusOptions={statusOptions}
-        IsCompletedTable={true}
-        IsDraftTable={false}
-      />
+<TaskFilters
+  storageKey="inboxFilters"  
+  formState={formState}
+  handleInputChange={handleInputChange}
+  handleSearch={handleSearch}
+  handleClear={handleClear}
+  docTypeOptions={docTypeOptions}
+  statusOptions={statusOptions}
+  IsCompletedTable={true}
+  IsDraftTable={false}
+/>
 
       <div className="table-wrapper">
         <DataTable

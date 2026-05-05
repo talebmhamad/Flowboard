@@ -147,6 +147,7 @@ export default function DraftTable() {
 
       {/* Filters */}
       <TaskFilters
+        storageKey="draftFilters" 
         formState={formState}
         handleInputChange={handleInputChange}
         handleSearch={handleSearch}
