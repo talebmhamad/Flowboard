@@ -1,12 +1,6 @@
 import DashboardLayout from "../../layouts/DashboardLayout";
 import { useState, useEffect } from "react";
-import {
-  Outlet,
-  useLocation,
-  useParams,
-  useNavigate
-} from "react-router-dom";
-
+import { Outlet,useLocation,useParams,useNavigate } from "react-router-dom";
 import { getUserFromToken } from "../../utils/authUser";
 import { getUserSummary } from "../../services/userService";
 import { getWorkflows, getWorkflowForm } from "../../services/workflowService";
@@ -30,27 +24,41 @@ export default function UserDashboard() {
   const { user } = useAuth();
 
   useEffect(() => {
-    const currentUser = user;
+    let isMounted = true;
 
-    const fetchData = async () => {
+    const loadSummary = async () => {
       try {
-        const [summaryData, workflowData] = await Promise.all([
-          getUserSummary(),
-          getWorkflows()
-        ]);
+      const data = await getUserSummary();
 
-        setSummary(summaryData);
-        setWorkflows(workflowData);
+      if (isMounted) {
+        setSummary(data);
+      }
       } catch (err) {
-        console.error("Dashboard Data Fetch Error:", err);
+      console.error("Summary Load Error:", err);
       }
     };
 
-    fetchData();
+    const loadWorkflows = async () => {
+    try {
+      const data = await getWorkflows();
+
+     if (isMounted) {
+        setWorkflows(data);
+       }
+     } catch (err) {
+      console.error("Workflow Load Error:", err);
+     }
+    };
+
+    loadSummary();
+    loadWorkflows();
+
+    return () => {
+     isMounted = false;
+    };
   }, []);
 
-  //  Unified routing handler
-  useEffect(() => {
+     useEffect(() => {
     if (!mode) {
       setSelectedWorkflow(null);
       return;
@@ -71,10 +79,9 @@ export default function UserDashboard() {
       });
     }
 
-  }, [mode, id]);
+     }, [mode, id]);
 
-  //  Load workflow (new)
-  const loadWorkflowForm = async (workflowId) => {
+     const loadWorkflowForm = async (workflowId) => {
     try {
       setLoadingForm(true);
 

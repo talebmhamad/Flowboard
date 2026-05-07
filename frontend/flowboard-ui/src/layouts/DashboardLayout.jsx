@@ -14,8 +14,8 @@ export default function DashboardLayout({
   const navigate = useNavigate();
 
   const handleLogout = () => {
-    logoutUser();       // ✅ clean
-    navigate("/login"); // ✅ SPA redirect
+    logoutUser();      
+    navigate("/login"); 
   };
 
   return (
