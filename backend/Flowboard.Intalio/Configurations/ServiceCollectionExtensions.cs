@@ -29,6 +29,8 @@ namespace Flowboard.Intalio.Configurations
 
             services.AddScoped<TaskRepository>();
             services.AddScoped<ITaskService, TaskService>();
+            services.AddScoped<IDocumentIntalioService, DocumentIntalioService>();
+            services.AddScoped<IDocumentRepository, DocumentRepository>();
 
             return services;
         }

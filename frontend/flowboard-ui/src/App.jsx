@@ -16,6 +16,7 @@ import HomeDashboard from "./components/HomeDashboard";
 import InboxTable from "./components/InboxTable";
 import CompleteTable from "./components/CompletedTable";
 import DraftTable from "./components/DraftTable";
+import TrackingTable from "./components/TrackingTable";
 
 function App() {
   return (
@@ -42,6 +43,7 @@ function App() {
           <Route path="inbox" element={<InboxTable />} />
           <Route path="completed" element={<CompleteTable />} />
           <Route path="draft" element={<DraftTable />} />
+          <Route path="tracking" element={<TrackingTable />} />
           <Route path="form/:mode/:id?" element={<div />} />
 
         </Route>

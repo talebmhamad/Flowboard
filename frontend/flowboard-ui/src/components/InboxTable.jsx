@@ -115,7 +115,7 @@ export default function InboxTable() {
     loadInbox(formState, p, newSize);
   };
 
-  //  FIX: use workflows instead of props
+  //   use workflows instead of props
   const docTypeOptions = (workflows || []).map((wf) => ({
     value: wf.id,
     label: wf.text,
@@ -131,7 +131,7 @@ export default function InboxTable() {
     statusOptions.map((s) => [s.value, s])
   );
 
-  //  NEW: ROUTING instead of state
+  //   ROUTING instead of state
   const handleEdit = (row) => {
     navigate(`/dashboard/form/task/${row.id}`, {
     state: { from: "/dashboard/inbox" }
@@ -196,7 +196,7 @@ export default function InboxTable() {
   return (
     <div className="inbox-container">
 
-<TaskFilters
+ <TaskFilters
   storageKey="inboxFilters"  
   formState={formState}
   handleInputChange={handleInputChange}
@@ -206,7 +206,7 @@ export default function InboxTable() {
   statusOptions={statusOptions}
   IsCompletedTable={true}
   IsDraftTable={false}
-/>
+ />
 
       <div className="table-wrapper">
         <DataTable

@@ -43,6 +43,7 @@
   <ItemGroup>
     <Compile Include="DTOs\CountDto.cs" />
     <Compile Include="DTOs\DataTableResponse.cs" />
+    <Compile Include="DTOs\DocumentDetailsDto.cs" />
     <Compile Include="DTOs\InboxTaskDto.cs" />
     <Compile Include="DTOs\SaveDocumentDto.cs" />
     <Compile Include="DTOs\SaveTaskDto.cs" />

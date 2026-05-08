@@ -1,8 +1,9 @@
 import { useEffect, useRef, useState } from "react";
 import { getDocumentByTaskId } from "../services/documentService";
+import { getTrackingByTaskId } from "../services/documentService";
 import Loader from "./Loader";
 
-export default function DocumentMetadata({ taskId }) {
+export default function DocumentMetadata({ taskId ,WhoIs = "User"}) {
   const [docFull, setDocFull] = useState(null);
   const metaFormRef = useRef(null);
 
@@ -20,7 +21,7 @@ export default function DocumentMetadata({ taskId }) {
 
     const loadMeta = async () => {
       try {
-        const res = await getDocumentByTaskId(taskId);
+        const res =WhoIs === "Manager" ? await getTrackingByTaskId(taskId) : await getDocumentByTaskId(taskId);
 
         setDocFull({
           ...res,

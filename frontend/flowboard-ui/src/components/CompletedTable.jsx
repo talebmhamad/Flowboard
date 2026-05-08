@@ -4,7 +4,7 @@ import { getCompletedTasks } from "../services/taskService";
 import TaskFilters from "./TaskFilters";
 import "../styles/Inbox.css";
 import { useStatuses } from "../hooks/useStatuses";
-import DocumentMetadata from "./DocumentMetadata"; // 🔥 NEW
+import DocumentMetadata from "./DocumentMetadata"; 
 
 export default function CompletedTable({ documentTypes = [] }) {
   const DataTable = DataTableModule.default;
@@ -108,7 +108,7 @@ export default function CompletedTable({ documentTypes = [] }) {
     statusOptions.map((s) => [s.value, s])
   );
 
-  // 🔥 UPDATED COLUMNS
+  //  UPDATED COLUMNS
   const columns = [
     {
       name: "Document Type",

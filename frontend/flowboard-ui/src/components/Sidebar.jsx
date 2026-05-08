@@ -104,16 +104,18 @@ export default function Sidebar({ activeTab, user }) {
                   <span className="label">{item.label}</span>
 
                   {/* COUNTS */}
-                  {item.key !== "home" && (
-                    <div className="badge-container">
-                      <span className="badge-today">
-                        {counts.today}
-                      </span>
-                      <span className="badge-total">
-                        {counts.total}
-                      </span>
-                    </div>
-                  )}
+{item.key !== "home" &&
+ item.key !== "tracking" && (
+  <div className="badge-container">
+    <span className="badge-today">
+      {counts.today}
+    </span>
+
+    <span className="badge-total">
+      {counts.total}
+    </span>
+  </div>
+)}
                 </>
               )}
 

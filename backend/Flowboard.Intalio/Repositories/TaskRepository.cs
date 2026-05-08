@@ -19,7 +19,7 @@ namespace Flowboard.Intalio.Repositories
                 from task in _db.Task
 
                 join user in _db.Users
-                    on task.OwnerUserId equals user.Id into userJoin
+                    on task.UserId equals user.Id into userJoin
                 from user in userJoin.DefaultIfEmpty()
 
                 join document in _db.Document
@@ -39,8 +39,8 @@ namespace Flowboard.Intalio.Repositories
                     task.ClosedDate == null &&
 
                     // Assigned users
-                    task.OwnerUserId.HasValue &&
-                    userIds.Contains(task.OwnerUserId!.Value) &&
+                    task.UserId.HasValue &&
+                    userIds.Contains(task.UserId!.Value) &&
 
                     // Reference number filter
                     (
@@ -164,5 +164,6 @@ namespace Flowboard.Intalio.Repositories
                 Data = data
             };
         }
+
     }
 }

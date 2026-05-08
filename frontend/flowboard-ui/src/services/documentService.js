@@ -72,3 +72,23 @@ export const getDocumentByTaskId = async (taskId) => {
 export const getDocumentById = async (id) => {
   return await apiFetch(`${API_URL}/document/${id}`);
 };
+
+export const getTrackingByTaskId = async (taskId) => {
+  try {
+    const data = await apiFetch(
+      `${API_URL}/admin/document/by-task/${taskId}`,
+      {
+        method: "GET"
+      }
+    );
+
+    return data;
+  } catch (error) {
+    console.error(
+      "Error in getTrackingByTaskId:",
+      error
+    );
+
+    throw error;
+  }
+};
