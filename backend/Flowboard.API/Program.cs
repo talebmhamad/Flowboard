@@ -1,11 +1,13 @@
 ﻿using Flowboard.Application.Interfaces;
+using Flowboard.Infrastructure.Handlers;
 using Flowboard.Infrastructure.Services;
 using Flowboard.Infrastructure.Settings;
-using Flowboard.Infrastructure.Handlers;
-
+using Flowboard.Intalio.Configurations;
+using Flowboard.Intalio.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
+
 
 var builder = WebApplication.CreateBuilder(args);
 var iamSettings = builder.Configuration.GetSection("IAM").Get<IamSettings>()!;
@@ -79,6 +81,8 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
 
 builder.Services.AddAuthorization();
 
+builder.Services.AddIntalioInfrastructure(builder.Configuration);
+
 
 builder.Services.AddHttpContextAccessor();
 
@@ -145,6 +149,8 @@ builder.Services.AddCors(options =>
               .AllowAnyMethod();
     });
 });
+
+IntalioConfigurator.Configure(builder.Configuration);
 
 var app = builder.Build();
 
