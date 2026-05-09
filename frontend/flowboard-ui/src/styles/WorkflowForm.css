@@ -3,8 +3,8 @@
   --border-color: #e2e8f0;
   --text-muted: #475569;
   
-  --btn-save-bg: #22c55e;    
-  --btn-send-bg: #3b82f6;   
+  --btn-save-bg: #16a34a;  
+  --btn-send-bg: #2563eb;  
   --btn-hover-opacity: 0.9;
 }
 
@@ -50,36 +50,38 @@
   border: 1px solid var(--border-color);
 }
 
-.form-actions .btn {
-  padding: 10px 24px;
-  font-size: 0.875rem;
-  font-weight: 600;
-  border: none;
-  color: #ffffff;
-  cursor: pointer;
-  transition: none; 
-}
-
-/* MERGE EFFECT */
-.form-actions .btn + .btn {
-  border-left: 1px solid rgba(255,255,255,0.2);
-}
-
-/* COLORS */
-.form-actions .btn-save {
-  background-color: var(--btn-save-bg);
-}
-
-.form-actions .btn-send {
-  background-color: var(--btn-send-bg);
-}
-
-.form-actions .btn:active {
-  transform: translateY(1px);
-}
-
 /* DISABLED */
 .form-actions .btn:disabled {
   opacity: 0.6;
   cursor: not-allowed;
+}
+
+.workflow-header-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+  width: 100%;
+}
+
+.form-title {
+  margin: 0;
+}
+
+.btn-back {
+  background-color: #ad4d74;
+  border-color: #ad4d74;
+  color: #fff;
+  padding: 8px 16px;
+  border-radius: 6px;
+  border: none;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+.btn-back:hover {
+  opacity: 0.9;
 }

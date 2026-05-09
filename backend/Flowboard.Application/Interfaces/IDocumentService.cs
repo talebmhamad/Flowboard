@@ -8,4 +8,10 @@ public interface IDocumentService
 
     Task<string> SaveAndSendDocumentAsync(SaveDocumentDto request);
 
+    Task<string> GetDocumentBasicInfoByTaskId(int taskId);
+
+    Task<string> GetDocumentByTaskId(int taskId);
+
+    Task<string> GetDocumentById(int id);
+
 }

@@ -1,32 +1,67 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import "../styles/sidebar.css";
 import { useAppContext } from "../context/AppContext";
+import { useNavigate } from "react-router-dom";
 
-export default function Sidebar({
-  activeTab,
-  setActiveTab,
-  user
-}) {
-  const [isCollapsed, setIsCollapsed] = useState(false);
+export default function Sidebar({ activeTab, user }) {
+  const navigate = useNavigate();
+  const { summary } = useAppContext();
+  const role = user?.role || "User";
 
-  // Safe counts
+  const [isCollapsed, setIsCollapsed] = useState(() => {
+    const saved = localStorage.getItem("sidebarCollapsed");
+    return saved === "true";
+  });
+
+  useEffect(() => {
+    localStorage.setItem("sidebarCollapsed", isCollapsed);
+  }, [isCollapsed]);
+
   const getCounts = (key) => ({
     today: summary?.[key]?.today ?? 0,
     total: summary?.[key]?.total ?? 0
   });
 
   const menu = [
-    { key: "home", label: "Dashboard", icon: "bi-grid-1x2-fill" },
-    { key: "inbox", label: "Inbox", icon: "bi-chat-square-text-fill" },
-    { key: "completed", label: "Completed", icon: "bi-patch-check-all" },
-    { key: "draft", label: "Drafts", icon: "bi-file-earmark-diff-fill" }
+    {
+      key: "home",
+      label: "Dashboard",
+      icon: "bi-grid-1x2-fill",
+      roles: ["User", "Administrator"]
+    },
+    {
+      key: "inbox",
+      label: "Inbox",
+      icon: "bi-chat-square-text-fill",
+      roles: ["User", "Administrator"]
+    },
+    {
+      key: "completed",
+      label: "Completed",
+      icon: "bi-patch-check-all",
+      roles: ["User", "Administrator"]
+    },
+    {
+      key: "draft",
+      label: "Drafts",
+      icon: "bi-file-earmark-diff-fill",
+      roles: ["User", "Administrator"]
+    },
+    {
+      key: "tracking",
+      label: "Tracking",
+      icon: "bi-clipboard-check",
+      roles: ["Administrator"] 
+    }
   ];
 
-  const { summary } = useAppContext();
+  const filteredMenu = menu.filter((item) =>
+    item.roles.includes(role)
+  );
 
   return (
     <aside className={`sidebar ${isCollapsed ? "collapsed" : ""}`}>
-      
+
       {/* HEADER */}
       <div className="sidebar-header">
         <div className="logo-wrapper">
@@ -36,7 +71,7 @@ export default function Sidebar({
 
         <button
           className="toggle-btn"
-          onClick={() => setIsCollapsed(!isCollapsed)}
+          onClick={() => setIsCollapsed((prev) => !prev)}
         >
           <i
             className={`bi ${
@@ -48,7 +83,7 @@ export default function Sidebar({
 
       {/* NAV */}
       <nav className="sidebar-nav">
-        {menu.map((item) => {
+        {filteredMenu.map((item) => {
           const counts = getCounts(item.key);
 
           return (
@@ -57,7 +92,7 @@ export default function Sidebar({
               className={`nav-item ${
                 activeTab === item.key ? "active" : ""
               }`}
-              onClick={() => setActiveTab(item.key)} 
+              onClick={() => navigate(`/dashboard/${item.key}`)}
               title={isCollapsed ? item.label : ""}
             >
               <div className="nav-icon-box">
@@ -69,16 +104,18 @@ export default function Sidebar({
                   <span className="label">{item.label}</span>
 
                   {/* COUNTS */}
-                  {item.key !== "home" && (
-                    <div className="badge-container">
-                      <span className="badge-today">
-                        {counts.today}
-                      </span>
-                      <span className="badge-total">
-                        {counts.total}
-                      </span>
-                    </div>
-                  )}
+{item.key !== "home" &&
+ item.key !== "tracking" && (
+  <div className="badge-container">
+    <span className="badge-today">
+      {counts.today}
+    </span>
+
+    <span className="badge-total">
+      {counts.total}
+    </span>
+  </div>
+)}
                 </>
               )}
 
@@ -100,7 +137,7 @@ export default function Sidebar({
           {!isCollapsed && (
             <div className="user-info">
               <span className="user-name">{user?.fullName}</span>
-              <span className="user-role">Administrator</span>
+              <span className="user-role">{role}</span>
             </div>
           )}
         </div>

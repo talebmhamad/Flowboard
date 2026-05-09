@@ -5,10 +5,12 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import 'bootstrap-icons/font/bootstrap-icons.css';
 import { BrowserRouter } from "react-router-dom";
 import "formiojs/dist/formio.full.min.css";
-
+import { AuthProvider } from "./context/AuthContext"; // 👈 add this
 
 ReactDOM.createRoot(document.getElementById("root")).render(
   <BrowserRouter>
-    <App />
+    <AuthProvider>   
+      <App />
+    </AuthProvider>
   </BrowserRouter>
 );

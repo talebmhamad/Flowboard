@@ -3,7 +3,7 @@
 
 namespace Flowboard.Application.DTOs
 {
-    public class TaskInboxRequestDto
+    public class TaskRequestDto
     {
         // DataTables pagination
         public int Draw { get; set; } = 1;

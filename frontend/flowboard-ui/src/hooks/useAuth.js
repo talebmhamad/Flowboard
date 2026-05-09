@@ -1,9 +1,14 @@
 import { useState } from "react";
 import * as authService from "../services/authService";
+import { getUserFromToken } from "../utils/authUser";
+import { useAuth as useAuthContext } from "../context/AuthContext";
+import { clearToken } from "../utils/authStorage";
 
-export const useAuth = () => {
+export const useLogin = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+
+  const { setUser } = useAuthContext();
 
   const loginUser = async (username, password) => {
     try {
@@ -14,6 +19,9 @@ export const useAuth = () => {
 
       sessionStorage.setItem("token", data.token);
 
+      const user = getUserFromToken();
+      setUser(user);
+
       return true;
     } catch (err) {
       setError(err.message);
@@ -23,5 +31,10 @@ export const useAuth = () => {
     }
   };
 
-  return { loginUser, loading, error };
+  const logoutUser = () => {
+    clearToken();  
+    setUser(null);  
+  };
+
+  return { loginUser, logoutUser, loading, error };
 };

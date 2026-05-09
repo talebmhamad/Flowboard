@@ -1,23 +1,29 @@
 import React, { useEffect, useState } from "react";
 import DataTableModule from "react-data-table-component";
+import { useNavigate } from "react-router-dom";
+
 import { getActiveTasks } from "../services/taskService";
-import { getStatuses } from "../services/statusService";
 import TaskFilters from "./TaskFilters";
 import "../styles/Inbox.css";
+import { useStatuses } from "../hooks/useStatuses";
+import { useOutletContext } from "react-router-dom";
 
-export default function InboxTable({ documentTypes = [] }) {
+export default function InboxTable() {
   const DataTable = DataTableModule.default;
+
+  const navigate = useNavigate();
+
+  //  get workflows from context (routing)
+  const { workflows = [] } = useOutletContext();
 
   const [tasks, setTasks] = useState([]);
   const [loading, setLoading] = useState(true);
+  const { statuses } = useStatuses();
 
   const [page, setPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);
   const [totalRows, setTotalRows] = useState(0);
 
-  const [statuses, setStatuses] = useState([]);
-
-  // ✅ FIXED: single values (not arrays)
   const initialFormState = {
     refNumber: "",
     fromDate: "",
@@ -32,21 +38,6 @@ export default function InboxTable({ documentTypes = [] }) {
 
   const [formState, setFormState] = useState(initialFormState);
 
-  //  LOAD STATUS 
-  useEffect(() => {
-    const fetchStatuses = async () => {
-      try {
-        const data = await getStatuses();
-        setStatuses(data);
-      } catch (err) {
-        console.error("Status load error:", err);
-      }
-    };
-
-    fetchStatuses();
-  }, []);
-
-  //  LOAD INBOX 
   useEffect(() => {
     loadInbox(initialFormState, 1, pageSize);
   }, []);
@@ -61,10 +52,8 @@ export default function InboxTable({ documentTypes = [] }) {
         length: size,
         nodeId: 2,
 
-        //  FIXED (no array)
         documentTypeId: filters.docType?.value || 0,
         statusId: filters.status?.value || 0,
-
         referenceNumber: filters.refNumber || "",
 
         fromDate: filters.fromDate
@@ -96,7 +85,6 @@ export default function InboxTable({ documentTypes = [] }) {
     }
   };
 
-  //  HANDLERS 
   const handleInputChange = (e) => {
     const { name, value, type, checked } = e.target;
 
@@ -117,7 +105,6 @@ export default function InboxTable({ documentTypes = [] }) {
     loadInbox(initialFormState, 1, pageSize);
   };
 
-  //  PAGINATION 
   const handlePageChange = (p) => {
     setPage(p);
     loadInbox(formState, p, pageSize);
@@ -128,8 +115,8 @@ export default function InboxTable({ documentTypes = [] }) {
     loadInbox(formState, p, newSize);
   };
 
-  //  OPTIONS 
-  const docTypeOptions = documentTypes.map((wf) => ({
+  //   use workflows instead of props
+  const docTypeOptions = (workflows || []).map((wf) => ({
     value: wf.id,
     label: wf.text,
   }));
@@ -137,10 +124,20 @@ export default function InboxTable({ documentTypes = [] }) {
   const statusOptions = statuses.map((s) => ({
     value: s.id,
     label: s.text,
-    color: s.color,
+    color: s.color || "#888",
   }));
 
-  //  COLUMNS 
+  const statusMap = Object.fromEntries(
+    statusOptions.map((s) => [s.value, s])
+  );
+
+  //   ROUTING instead of state
+  const handleEdit = (row) => {
+    navigate(`/dashboard/form/task/${row.id}`, {
+    state: { from: "/dashboard/inbox" }
+    });
+  };
+
   const columns = [
     {
       name: "Document Type",
@@ -165,42 +162,51 @@ export default function InboxTable({ documentTypes = [] }) {
     {
       name: "Status",
       cell: (row) => {
-        const statusText = String(row.status || "Pending");
-
+        const status = statusMap[row.status];
         return (
           <span
-            className={`status-badge ${statusText
-              .toLowerCase()
-              .replace(/\s+/g, "-")}`}
+            className="status-badge"
+            style={{
+              backgroundColor: status?.color || "#ccc",
+              color: "#fff",
+            }}
           >
-            {statusText}
+            {status?.label || "Unknown"}
           </span>
         );
       },
     },
     {
       name: "",
-      cell: () => (
-        <div style={{ display: "flex", justifyContent: "flex-end" }}>
-          <button className="btn-edit-square">
-            <i className="bi bi-pencil"></i>
-          </button>
-        </div>
+      width: "80px",
+      cell: (row) => (
+        <button
+          className="btn btn-sm btn-outline-primary"
+          onClick={() => handleEdit(row)}
+        >
+          <i className="bi bi-pencil"></i>
+        </button>
       ),
+      ignoreRowClick: true,
+      allowOverflow: true,
+      button: true,
     },
   ];
 
-  //  UI 
   return (
     <div className="inbox-container">
-      <TaskFilters
-        formState={formState}
-        handleInputChange={handleInputChange}
-        handleSearch={handleSearch}
-        handleClear={handleClear}
-        docTypeOptions={docTypeOptions}
-        statusOptions={statusOptions}
-      />
+
+ <TaskFilters
+  storageKey="inboxFilters"  
+  formState={formState}
+  handleInputChange={handleInputChange}
+  handleSearch={handleSearch}
+  handleClear={handleClear}
+  docTypeOptions={docTypeOptions}
+  statusOptions={statusOptions}
+  IsCompletedTable={true}
+  IsDraftTable={false}
+ />
 
       <div className="table-wrapper">
         <DataTable
