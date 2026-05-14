@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { saveDocument, saveAndSendDocument } from "../services/documentService";
+import { saveDocument, saveAndSendDocument } from "../../services/documentService";
 
 export const useDocument = () => {
   const [saving, setSaving] = useState(false);

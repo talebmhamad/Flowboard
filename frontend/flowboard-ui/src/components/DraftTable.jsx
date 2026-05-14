@@ -5,8 +5,6 @@ import { useOutletContext, useNavigate } from "react-router-dom";
 import { getDraftTasks } from "../services/taskService";
 import TaskFilters from "./TaskFilters";
 
-import "../styles/Inbox.css";
-
 export default function DraftTable() {
   const DataTable = DataTableModule.default;
 

@@ -1,9 +1,8 @@
 import React, { useEffect, useState } from "react";
 import DataTableModule from "react-data-table-component";
-import { getCompletedTasks } from "../services/taskService";
+import { getCompletedTasks } from "../services/taskService"
 import TaskFilters from "./TaskFilters";
-import "../styles/Inbox.css";
-import { useStatuses } from "../hooks/useStatuses";
+import { useStatuses } from "../hooks/status/useStatuses";
 import DocumentMetadata from "./DocumentMetadata"; 
 
 export default function CompletedTable({ documentTypes = [] }) {
@@ -176,11 +175,11 @@ export default function CompletedTable({ documentTypes = [] }) {
         <div className="d-flex justify-content-between mb-3">
           <h5>Application Metadata</h5>
 
-          <button
-            className="btn btn-outline-secondary btn-sm"
-            onClick={() => setSelectedTaskId(null)}
-          >
-            ← Back
+           <button
+           className="btn btn-outline-secondary btn-sm"
+           onClick={() => setSelectedTaskId(null)}
+           ><i className="bi bi-arrow-left me-1" />
+            Back
           </button>
         </div>
 

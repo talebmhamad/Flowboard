@@ -2,7 +2,7 @@ import React, { useEffect, useRef, useState } from "react";
 import { useSearchParams, useLocation } from "react-router-dom";
 import { getTaskDetails } from "../services/taskService";
 import { getDocumentBasicInfo } from "../services/documentService";
-import { useTask } from "../hooks/useTask";
+import { useTask } from "../hooks/task/useTask";
 import { showSuccess, showError, showWarning } from "../utils/toast";
 import { getUserSummary } from "../services/userService";
 import { useAppContext } from "../context/AppContext";
@@ -243,17 +243,48 @@ export default function TaskDetails({ taskId, task: initialTask, status, onBack 
                 <div ref={formRef}></div>
               </div>
 
-              <div className="form-actions">
-                <div className="btn-group">
-                  <button className="btn btn-success" onClick={handleSave} disabled={saving}>
-                    {saving ? "Saving..." : "Save"}
-                  </button>
 
-                  <button className="btn btn-primary" onClick={handleSend} disabled={sending}>
-                    {sending ? "Sending..." : "Send"}
-                  </button>
-                </div>
-              </div>
+               {/* ACTION BUTTONS */}
+
+        <div className="d-flex justify-content-end mt-4">
+
+          <div className="btn-group shadow-sm">
+
+            <button
+              className="btn btn-success px-4"
+              onClick={handleSave}
+              disabled={saving}
+            >
+
+              <i className="bi bi-save me-2"></i>
+
+              {
+                saving
+                  ? "Saving..."
+                  : "Save"
+              }
+
+            </button>
+
+            <button
+              className="btn btn-primary px-4"
+              onClick={handleSend}
+              disabled={sending}
+            >
+
+              <i className="bi bi-send me-2"></i>
+
+              {
+                sending
+                  ? "Sending..."
+                  : "Send"
+              }
+
+            </button>
+
+          </div>
+
+        </div>
             </>
           )}
 

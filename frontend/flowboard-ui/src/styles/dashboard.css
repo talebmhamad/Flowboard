@@ -75,7 +75,7 @@
   gap: 24px;
 }
 
-.workflow-card {
+.workflow-cards {
   background: #ffffff;
   border-radius: 20px;
   border: 1px solid #e2e8f0;
@@ -85,14 +85,13 @@
   box-shadow: 0 1px 3px rgba(0,0,0,0.1);
 }
 
-.workflow-card:hover {
+.workflow-cards:hover {
   background: #f1f5f9;
   border-color: #3b82f6;
   box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
 }
 
 .wf-icon-box {
-  background: #eff6ff;
   color: #3b82f6;
 }
 

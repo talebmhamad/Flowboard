@@ -1,8 +1,8 @@
 import { useState } from "react";
-import * as authService from "../services/authService";
-import { getUserFromToken } from "../utils/authUser";
-import { useAuth as useAuthContext } from "../context/AuthContext";
-import { clearToken } from "../utils/authStorage";
+import * as authService from "../../services/authService";
+import { getUserFromToken } from "../../utils/authUser";
+import { useAuth as useAuthContext } from "../../context/AuthContext";
+import { clearToken } from "../../utils/authStorage";
 
 export const useLogin = () => {
   const [loading, setLoading] = useState(false);

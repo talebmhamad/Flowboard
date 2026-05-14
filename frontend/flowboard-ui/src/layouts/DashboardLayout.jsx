@@ -1,6 +1,6 @@
 import Sidebar from "../components/Sidebar";
 import "../styles/dashboardLayout.css";
-import { useLogin } from "../hooks/useAuth"; 
+import { useLogin } from "../hooks/auth/useAuth";
 import { useNavigate } from "react-router-dom";
 
 export default function DashboardLayout({
@@ -20,6 +20,7 @@ export default function DashboardLayout({
 
   return (
     <div className="layout">
+      
       <Sidebar 
         onSelectWorkflow={onSelectWorkflow} 
         activeTab={activeTab}
@@ -42,11 +43,6 @@ export default function DashboardLayout({
           </div>
 
           <div className="header-right">
-            <div className="search-bar">
-              <i className="bi bi-search"></i>
-              <input type="text" placeholder="Search..." />
-            </div>
-
             <div className="header-actions">
               <div className="user-pill">
                 <span className="user-name">
