@@ -47,7 +47,7 @@ export default function WorkflowFormContent({ data, workflowTitle,onBack }) {
       console.error(err);
       showError("Save failed");
     }
-  }, [data, save, saving]);
+  }, [data, save, saving, setSummary, onBack]);
 
   //  SEND
   const handleSend = useCallback(async () => {
@@ -85,7 +85,7 @@ export default function WorkflowFormContent({ data, workflowTitle,onBack }) {
       console.error(err);
       showError("Send failed");
     }
-  }, [data, saveAndSend, sending]);
+  }, [data, saveAndSend, sending, setSummary, onBack]);
 
   //  FORM INIT
   useEffect(() => {
@@ -164,7 +164,7 @@ export default function WorkflowFormContent({ data, workflowTitle,onBack }) {
           {workflowTitle || "Workflow"}
         </h2>
         
-        <button className="btn btn-outline-secondary btn-sm" onClick={onBack}>
+        <button className="btn btn-outline-secondary btn-sm" onClick={() => onBack()}>
     <i className="bi bi-arrow-left me-2"></i> Back
         </button>
       </div>

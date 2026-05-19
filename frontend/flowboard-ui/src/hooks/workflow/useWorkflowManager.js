@@ -28,10 +28,6 @@ export default function useWorkflowManager() {
 
   const location = useLocation();
 
-  const from =
-    location.state?.from ||
-    "/dashboard/home";
-
   // Load workflow form
   const loadWorkflowForm = async (
     workflowId
@@ -49,7 +45,8 @@ export default function useWorkflowManager() {
         workflow: {
           id: workflowId
         },
-        form: formData
+        form: formData,
+        from: location.state?.from || "/dashboard/home"
       });
 
     } catch (err) {
@@ -102,7 +99,9 @@ export default function useWorkflowManager() {
         },
 
         formData:
-          res.formData
+          res.formData,
+
+        from: location.state?.from || "/dashboard/draft"
       });
 
     } catch (err) {
@@ -153,7 +152,9 @@ export default function useWorkflowManager() {
 
           setSelectedWorkflow({
             type: "task",
-            id
+            id,
+            status: location.state?.status,
+            from: location.state?.from || "/dashboard/inbox"
           });
 
         }
@@ -167,7 +168,7 @@ export default function useWorkflowManager() {
         break;
     }
 
-  }, [mode, id]);
+  }, [mode, id, location.state]);
 
   // Open workflow
   const handleSelectWorkflow = (
@@ -200,12 +201,27 @@ export default function useWorkflowManager() {
   };
 
   // Back handler
-  const handleBack = () => {
+const handleBack = (
+  customFrom
+) => {
 
-    setSelectedWorkflow(null);
+  if (
+    customFrom &&
+    typeof customFrom === "object"
+  ) {
+    customFrom = null;
+  }
 
-    navigate(from);
-  };
+  const from =
+    customFrom ||
+    selectedWorkflow?.from ||
+    "/dashboard/home";
+
+  setSelectedWorkflow(null);
+
+  navigate(from);
+
+};
 
   return {
 

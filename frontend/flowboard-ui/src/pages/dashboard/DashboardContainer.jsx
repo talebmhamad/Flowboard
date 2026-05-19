@@ -14,7 +14,8 @@ export default function DashboardContainer() {
   const { user } = useAuth();
   const {workflows,summary,loading} = useDashboardData();
   const {selectedWorkflow,loadingForm,handleSelectWorkflow,handleOpenDraft,handleBack} = useWorkflowManager();
-
+  const workflowTitle =workflows.find((w) => String(w.id) === String(selectedWorkflow?.workflow?.id))?.text || "Workflow";
+ 
   if (loading) {
    return (
      <Loader text="Loading dashboard..." />
@@ -40,16 +41,17 @@ export default function DashboardContainer() {
 
         <TaskDetails
           taskId={selectedWorkflow.id}
+          status={selectedWorkflow.status}
           onBack={handleBack}
         />
 
       ) : selectedWorkflow ? (
 
-        <WorkflowFormContent
-          data={selectedWorkflow}
-          onBack={handleBack}
-        />
-
+      <WorkflowFormContent
+       data={selectedWorkflow}
+       workflowTitle={workflowTitle}
+       onBack={handleBack}
+      />
       ) : (
 
         <Outlet

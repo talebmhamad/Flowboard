@@ -3,7 +3,7 @@ import { getDocumentByTaskId } from "../services/documentService";
 import { getTrackingByTaskId } from "../services/documentService";
 import Loader from "./Loader";
 
-export default function DocumentMetadata({ taskId ,WhoIs = "User"}) {
+export default function DocumentMetadata({ taskId, WhoIs = "User", onBack, fromPath }) {
   const [docFull, setDocFull] = useState(null);
   const metaFormRef = useRef(null);
 
@@ -63,8 +63,22 @@ if (!docFull) {
 }
 
   return (
-    <div className="p-3 border rounded bg-white">
-      <div ref={metaFormRef}></div>
+    <div>
+      {onBack && (
+        <div className="d-flex justify-content-between align-items-center mb-3">
+          <h6 className="mb-0">Metadata</h6>
+          <button
+            className="btn btn-sm btn-outline-secondary"
+            onClick={() => onBack(fromPath)}
+          >
+            <i className="bi bi-x me-1"></i>
+            Close
+          </button>
+        </div>
+      )}
+      <div className="p-3 border rounded bg-white">
+        <div ref={metaFormRef}></div>
+      </div>
     </div>
   );
 }

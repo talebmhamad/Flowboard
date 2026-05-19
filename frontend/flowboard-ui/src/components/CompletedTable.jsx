@@ -4,6 +4,7 @@ import { getCompletedTasks } from "../services/taskService"
 import TaskFilters from "./TaskFilters";
 import { useStatuses } from "../hooks/status/useStatuses";
 import DocumentMetadata from "./DocumentMetadata"; 
+import { getStatusBadgeClass } from "../utils/statusBadge";
 
 export default function CompletedTable({ documentTypes = [] }) {
   const DataTable = DataTableModule.default;
@@ -134,23 +135,20 @@ export default function CompletedTable({ documentTypes = [] }) {
       selector: (row) => row.createdDate || "-",
       sortable: true,
     },
-    {
-      name: "Status",
-      cell: (row) => {
-        const status = statusMap[row.status];
-        return (
-          <span
-            className="status-badge"
-            style={{
-              backgroundColor: status?.color || "#ccc",
-              color: "#fff",
-            }}
-          >
-            {status?.label || "Unknown"}
-          </span>
-        );
-      },
-    },
+   {
+  name: "Status",
+  cell: (row) => {
+    const status = statusMap[row.status];
+
+    return (
+      <span
+        className={`badge rounded-pill px-3 py-2 ${getStatusBadgeClass(status?.label)}`}
+      >
+        {status?.label || "Unknown"}
+      </span>
+    );
+  },
+},
     {
       name: "",
       width: "80px",
@@ -163,7 +161,6 @@ export default function CompletedTable({ documentTypes = [] }) {
         </button>
       ),
       ignoreRowClick: true,
-      allowOverflow: true,
       button: true,
     },
   ];

@@ -20,11 +20,11 @@ export default function InboxTable() {
   const { statuses } = useStatuses();
   const {tasks,loading,totalRows,page,setPage,pageSize,setPageSize,loadInbox,} = useInboxTasks();
 
-  useEffect(() => {
+ useEffect(() => {
 
-  loadInbox(initialFormState, 1, pageSize);
+   loadInbox(initialFormState, 1, pageSize);
 
-  },[initialFormState, pageSize, loadInbox]);
+  }, [pageSize]);
 
   const handleSearch = useCallback(() => {
 
@@ -107,68 +107,65 @@ export default function InboxTable() {
 
   const handleEdit = useCallback((row) => {
 
+  const taskStatus = statusMap[row.status];
+
   navigate(`/dashboard/form/task/${row.id}`, {
-    state: { from: "/dashboard/inbox" }
+    state: {
+      from: "/dashboard/inbox",
+      status: taskStatus
+    }
   });
 
-  }, [navigate]);
+  }, [navigate, statusMap]);
 
   const columns = useInboxColumns({ statusMap, handleEdit });
 
   return (
 
-  <div className="container-fluid py-3">
+  <div className="inbox-container">
 
-    <div className="card border-0 shadow-sm rounded-4">
+    {/* Filters */}
+    <TaskFilters
+      storageKey="inboxFilters"
+      formState={formState}
+      handleInputChange={handleInputChange}
+      handleSearch={handleSearch}
+      handleClear={handleClear}
+      docTypeOptions={docTypeOptions}
+      statusOptions={statusOptions}
+      IsCompletedTable={true}
+      IsDraftTable={false}
+    />
 
-      <div className="card-body">
+    {/* Table */}
+    <div className="table-wrapper">
+      <DataTable
+        key="inbox-table"
+        columns={columns}
+        data={tasks}
 
-        <TaskFilters
-          storageKey="inboxFilters"
-          formState={formState}
-          handleInputChange={handleInputChange}
-          handleSearch={handleSearch}
-          handleClear={handleClear}
-          docTypeOptions={docTypeOptions}
-          statusOptions={statusOptions}
-          IsCompletedTable={true}
-          IsDraftTable={false}
-        />
+        progressPending={
+          loading && tasks.length === 0
+        }
 
-        <div className="table-responsive mt-4">
+        pagination
+        paginationServer
 
-          <DataTable
-            key="inbox-table"
-            columns={columns}
-            data={tasks}
+        paginationTotalRows={totalRows}
 
-            progressPending={
-              loading && tasks.length === 0
-            }
+        paginationPerPage={pageSize}
 
-            pagination
-            paginationServer
+        onChangePage={handlePageChange}
 
-            paginationTotalRows={totalRows}
+        onChangeRowsPerPage={
+          handlePerRowsChange
+        }
 
-            paginationPerPage={pageSize}
-
-            onChangePage={handlePageChange}
-
-            onChangeRowsPerPage={
-              handlePerRowsChange
-            }
-
-            highlightOnHover
-            striped
-            responsive
-            persistTableHead
-          />
-
-        </div>
-
-      </div>
-
+        highlightOnHover
+        striped
+        responsive
+        persistTableHead
+      />
     </div>
 
   </div>

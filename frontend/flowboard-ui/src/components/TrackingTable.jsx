@@ -6,6 +6,7 @@ import TaskFilters from "./TaskFilters";
 import { useStatuses } from "../hooks/status/useStatuses";
 import DocumentMetadata from "./DocumentMetadata";
 import TrackingStatus from "./TrackingStatus";
+import { getStatusBadgeClass } from "../utils/statusBadge";
 
 const DataTable = DataTableModule.default;
 
@@ -150,20 +151,24 @@ export default function TrackingTable() {
           : "-",
       sortable: true,
     },
-    {
-      name: "Status",
-      cell: (row) => {
-        const status = statusMap[row.statusId];
-        return (
-          <span
-            className="status-badge"
-            style={{ backgroundColor: status?.color || "#ccc", color: "#fff" }}
-          >
-            {status?.label || "Unknown"}
-          </span>
-        );
-      },
-    },
+{
+  name: "Status",
+
+  cell: (row) => {
+
+    const status = statusMap[row.statusId];
+
+    return (
+
+      <span
+        className={`badge rounded-pill px-3 py-2 ${getStatusBadgeClass(status?.label)}`}
+      >
+        {status?.label || "Unknown"}
+      </span>
+
+    );
+  },
+},
     {
       name: "",
       width: "80px",
@@ -176,7 +181,6 @@ export default function TrackingTable() {
         </button>
       ),
       ignoreRowClick: true,
-      allowOverflow: true,
       button: true,
     },
   ];
