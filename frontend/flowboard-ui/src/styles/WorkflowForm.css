@@ -1,0 +1,85 @@
+:root {
+  --bg-page: #f8fafc;
+  --border-color: #e2e8f0;
+  --text-muted: #475569;
+  
+  --btn-save-bg: #16a34a;  
+  --btn-send-bg: #2563eb;  
+  --btn-hover-opacity: 0.9;
+}
+
+.workflow-container {
+  background-color: var(--bg-page);
+  min-height: 100vh;
+  font-family: 'Inter', sans-serif;
+}
+
+.workflow-card {
+  background: #ffffff;
+  padding: 15px;
+  box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+}
+
+.form-title {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: #1e293b;
+  margin-bottom: 24px;
+}
+
+.form-control {
+  border: 1px solid var(--border-color) !important;
+  border-radius: 8px !important;
+  padding: 0.6rem 0.8rem !important;
+  color: #1e293b !important;
+}
+
+/* ACTIONS CONTAINER */
+.form-actions {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 24px;
+}
+
+.form-actions .btn-group {
+  display: inline-flex;
+  border-radius: 8px;
+  overflow: hidden;
+  border: 1px solid var(--border-color);
+}
+
+/* DISABLED */
+.form-actions .btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.workflow-header-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+  width: 100%;
+}
+
+.form-title {
+  margin: 0;
+}
+
+.btn-back {
+  background-color: #ad4d74;
+  border-color: #ad4d74;
+  color: #fff;
+  padding: 8px 16px;
+  border-radius: 6px;
+  border: none;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+.btn-back:hover {
+  opacity: 0.9;
+}

@@ -1,24 +1,70 @@
-import { Routes, Route } from "react-router-dom";
+import { Routes, Route, Navigate } from "react-router-dom";
+import { ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+
+import { AppProvider } from "./context/AppContext";
+
+// Pages
 import Login from "./pages/Login";
-import Dashboard from "./pages/dashboard/Dashboard";
+
+// Components
 import ProtectedRoute from "./components/ProtectedRoute";
+
+// Child pages
+import HomeDashboard from "./components/HomeDashboard";
+import InboxTable from "./components/InboxTable";
+import CompleteTable from "./components/CompletedTable";
+import DraftTable from "./components/DraftTable";
+import TrackingTable from "./components/TrackingTable";
+import DashboardContainer from "./pages/dashboard/DashboardContainer";
 
 function App() {
   return (
-    <Routes>
-      <Route path="/login" element={<Login />} />
+    <AppProvider>
+      <Routes>
 
-      <Route
-        path="/dashboard"
-        element={
-          <ProtectedRoute>
-            <Dashboard />
-          </ProtectedRoute>
-        }
+        {/* PUBLIC */}
+        <Route path="/login" element={<Login />} />
+
+        {/* PROTECTED + DASHBOARD */}
+        <Route
+          path="/dashboard"
+          element={
+            <ProtectedRoute>
+              <DashboardContainer />
+            </ProtectedRoute>
+          }
+        >
+          {/* Default */}
+          <Route index element={<Navigate to="home" replace />} />
+
+          {/* Main pages */}
+          <Route path="home" element={<HomeDashboard />} />
+          <Route path="inbox" element={<InboxTable />} />
+          <Route path="completed" element={<CompleteTable />} />
+          <Route path="draft" element={<DraftTable />} />
+          <Route path="tracking" element={<TrackingTable />} />
+          <Route path="form/:mode/:id?" element={<div />} />
+
+        </Route>
+
+        {/* Redirects */}
+        <Route path="/" element={<Navigate to="/dashboard" replace />} />
+        <Route path="*" element={<Navigate to="/dashboard" replace />} />
+
+      </Routes>
+
+      <ToastContainer
+        position="top-right"
+        autoClose={3000}
+        newestOnTop
+        closeOnClick
+        pauseOnHover
+        draggable
+        theme="colored"
+        limit={3}
       />
-
-      <Route path="*" element={<Login />} />
-    </Routes>
+    </AppProvider>
   );
 }
 

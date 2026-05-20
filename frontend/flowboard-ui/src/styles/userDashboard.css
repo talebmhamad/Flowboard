@@ -1,0 +1,52 @@
+/* Container for the whole top bar */
+.layout-header {
+  display: flex;
+  justify-content: space-between; /* Tabs on left, User on right */
+  align-items: center;
+  background: #ffffff;
+  padding: 0 24px;
+  border-bottom: 1px solid #e5e7eb;
+  height: 64px; /* Fixed height for a consistent look */
+}
+
+/* Tabs container inside the header */
+.dashboard-tabs {
+  display: flex;
+  gap: 32px;
+  height: 100%; /* Make buttons fill the header height */
+}
+
+.dashboard-tab {
+  height: 100%;
+  padding: 0 4px;
+  border: none;
+  background: none;
+  color: #6b7280;
+  cursor: pointer;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  border-bottom: 3px solid transparent; /* Slightly thicker for better visibility */
+  transition: all 0.2s ease;
+}
+
+.dashboard-tab.active {
+  border-bottom: 3px solid #52a187;
+  color: #52a187;
+}
+
+/* Right side of header (User + Lock) */
+.header-right-section {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+
+.header-user {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-weight: 500;
+  color: #374151;
+}

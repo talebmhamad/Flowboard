@@ -1,0 +1,61 @@
+﻿using Flowboard.Application.DTOs;
+using Flowboard.Application.Interfaces;
+using Microsoft.AspNetCore.Http;
+using System;
+using System.Collections.Generic;
+using System.Net.Http;
+using System.Text.Json;
+using System.Threading.Tasks;
+
+namespace Flowboard.Infrastructure.Services
+{
+    public class WorkflowService : IWorkflowService
+    {
+        private readonly HttpClient _http;
+        public WorkflowService(HttpClient http)
+        {
+            _http = http;
+        }
+
+        public async Task<List<WorkflowDto>> GetWorkflowsAsync()
+        {
+            var url = $"DocumentType/ListByUser?delegationId=Null";
+
+            var response = await _http.GetAsync(url);
+
+            var content = await response.Content.ReadAsStringAsync();
+
+            if (!response.IsSuccessStatusCode)
+                throw new Exception($"Portal API Error: {response.StatusCode} - {content}");
+
+            if (string.IsNullOrWhiteSpace(content))
+                return new List<WorkflowDto>();
+
+            var data = JsonSerializer.Deserialize<List<WorkflowDto>>(content, new JsonSerializerOptions
+            {
+                PropertyNameCaseInsensitive = true
+            });
+
+            return data ?? new List<WorkflowDto>();
+        }
+
+        public async Task<string> GetWorkflowFormAsync(int documentTypeId)
+        {
+            var url = $"Document/GetForm?documentTypeId={documentTypeId}";
+
+            var response = await _http.GetAsync(url);
+
+            var content = await response.Content.ReadAsStringAsync();
+
+            if (!response.IsSuccessStatusCode)
+                throw new Exception($"Portal API Error: {response.StatusCode} - {content}");
+
+            if (string.IsNullOrWhiteSpace(content))
+                return "{}";
+
+            return content; 
+        }
+
+    }
+
+}

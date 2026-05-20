@@ -1,0 +1,217 @@
+import { useEffect, useRef, useCallback } from "react";
+import "../styles/WorkflowForm.css";
+import { useDocument } from "../hooks/document/useDocument";
+import { showSuccess, showError, showWarning } from "../utils/toast";
+import { useAppContext } from "../context/AppContext";
+import { getUserSummary } from "../services/userService";
+
+export default function WorkflowFormContent({ data, workflowTitle,onBack }) {
+  const formRef = useRef(null);
+  const formInstanceRef = useRef(null);
+  const { save, saveAndSend, saving, sending } = useDocument();
+  const { setSummary } = useAppContext();
+
+  //  SAVE
+  const handleSave = useCallback(async () => {
+    if (saving) return;
+
+    try {
+      const form = formInstanceRef.current;
+
+      const isValid = await form.checkValidity(null, true);
+
+      if (!isValid) {
+        showError("Please fill all required fields");
+        return;
+      }
+
+      const formData = form.submission.data;
+
+      await save({
+        documentTypeId: data.workflow.id,
+        workflowId: null,
+        formData,
+        id: data.id || "",
+        rowVersion: data.rowVersion || "",
+      });
+
+      showSuccess("Saved successfully!");
+
+      const newSummary = await getUserSummary();
+      setSummary(newSummary);
+
+      setTimeout(() => {
+        onBack();
+      }, 800);
+    } catch (err) {
+      console.error(err);
+      showError("Save failed");
+    }
+  }, [data, save, saving, setSummary, onBack]);
+
+  //  SEND
+  const handleSend = useCallback(async () => {
+    if (sending) return;
+
+    try {
+      const form = formInstanceRef.current;
+
+      const isValid = await form.checkValidity(null, true);
+
+      if (!isValid) {
+        toast.error("Please fill all required fields");
+        return;
+      }
+
+      const formData = form.submission.data;
+
+      await saveAndSend({
+        documentTypeId: data.workflow.id,
+        workflowId: null,
+        formData,
+        id: data.id || "",
+        rowVersion: data.rowVersion || "",
+      });
+
+      showSuccess("Sent successfully!");
+
+      const newSummary = await getUserSummary();
+      setSummary(newSummary);
+
+      setTimeout(() => {
+        onBack();
+      }, 800);
+    } catch (err) {
+      console.error(err);
+      showError("Send failed");
+    }
+  }, [data, saveAndSend, sending, setSummary, onBack]);
+
+  //  FORM INIT
+  useEffect(() => {
+    if (!data?.form || !formRef.current) return;
+    if (formInstanceRef.current) return;
+
+    let instance;
+
+    import("formiojs").then((FormioModule) => {
+      const FormioLib = FormioModule.default || FormioModule;
+      const Formio = FormioLib.Formio || FormioLib;
+
+      let formJson = {};
+
+      try {
+        formJson =
+          typeof data.form.formDesigner === "string"
+            ? JSON.parse(data.form.formDesigner)
+            : { ...data.form.formDesigner };
+      } catch (e) {
+        console.error("Invalid form JSON", e);
+        return;
+      }
+
+      delete formJson.title;
+
+      if (!formJson.components) {
+        formJson.components = [];
+      }
+
+      formRef.current.innerHTML = "";
+
+      Formio.createForm(formRef.current, formJson)
+       .then((formInstance) => {
+       instance = formInstance;
+       formInstanceRef.current = formInstance;
+
+       if (data?.formData) {
+         let parsedData = {};
+
+         if (data?.formData) {
+           try {
+             parsedData =
+               typeof data.formData === "string"
+                 ? JSON.parse(data.formData)
+                 : data.formData;
+           } catch (e) {
+             console.warn("Invalid formData (not JSON):", data.formData);
+             parsedData = {}; 
+           }
+         }
+
+         setTimeout(() => {
+           formInstance.submission = {
+             data: parsedData
+           };
+         }, 0);
+       }
+       })
+       .catch((err) => console.error("Formio Error:", err));
+    });
+
+    return () => {
+      if (instance?.destroy) instance.destroy();
+      if (formRef.current) formRef.current.innerHTML = "";
+      formInstanceRef.current = null;
+    };
+    console.log(data.form)
+  }, [data?.form]);
+
+  return (
+    <div className="workflow-container">
+      <div className="workflow-card">
+      <div className="workflow-header-row">
+        <h2 className="form-title">
+          {workflowTitle || "Workflow"}
+        </h2>
+        
+        <button className="btn btn-outline-secondary btn-sm" onClick={() => onBack()}>
+    <i className="bi bi-arrow-left me-2"></i> Back
+        </button>
+      </div>
+
+        <div ref={formRef} />
+        {/* ACTION BUTTONS */}
+
+        <div className="d-flex justify-content-end mt-4">
+
+          <div className="btn-group shadow-sm">
+
+            <button
+              className="btn btn-success px-4"
+              onClick={handleSave}
+              disabled={saving}
+            >
+
+              <i className="bi bi-save me-2"></i>
+
+              {
+                saving
+                  ? "Saving..."
+                  : "Save"
+              }
+
+            </button>
+
+            <button
+              className="btn btn-primary px-4"
+              onClick={handleSend}
+              disabled={sending}
+            >
+
+              <i className="bi bi-send me-2"></i>
+
+              {
+                sending
+                  ? "Sending..."
+                  : "Send"
+              }
+
+            </button>
+
+          </div>
+
+        </div>
+      </div>
+    </div>
+  );
+}

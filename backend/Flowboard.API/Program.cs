@@ -1,20 +1,22 @@
 ﻿using Flowboard.Application.Interfaces;
+using Flowboard.Application.Services;
+using Flowboard.Infrastructure.Handlers;
 using Flowboard.Infrastructure.Services;
 using Flowboard.Infrastructure.Settings;
+using Flowboard.Intalio.Configurations;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 
-var builder = WebApplication.CreateBuilder(args);
 
-//  Services
+var builder = WebApplication.CreateBuilder(args);
+var iamSettings = builder.Configuration.GetSection("IAM").Get<IamSettings>()!;
 
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 
 builder.Services.AddSwaggerGen(options =>
 {
-    //  Add JWT Authentication
     options.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
     {
         Name = "Authorization",
@@ -25,7 +27,6 @@ builder.Services.AddSwaggerGen(options =>
         Description = "Enter token like: Bearer YOUR_TOKEN"
     });
 
-    //  Apply it globally
     options.AddSecurityRequirement(new OpenApiSecurityRequirement
     {
         {
@@ -42,44 +43,126 @@ builder.Services.AddSwaggerGen(options =>
     });
 });
 
-//  IAM Settings
 builder.Services.Configure<IamSettings>(
     builder.Configuration.GetSection("IAM"));
 
-//  Dependency Injection
-builder.Services.AddHttpClient<IAuthService, AuthService>();
+builder.Services.Configure<PortalSettings>(
+    builder.Configuration.GetSection("Portal"));
 
-//  JWT Authentication
+builder.Services.AddHttpClient<IWorkflowService, WorkflowService>((sp, client) =>
+{
+    var portalSettings = sp
+        .GetRequiredService<Microsoft.Extensions.Options.IOptions<PortalSettings>>()
+        .Value;
+
+    client.BaseAddress = new Uri(portalSettings.BaseUrl);
+})
+.AddHttpMessageHandler<AuthTokenHandler>();
+
+
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(options =>
     {
-        options.Authority = "http://localhost:4000"; 
+        options.Authority = iamSettings.Url;
         options.RequireHttpsMetadata = false;
 
         options.TokenValidationParameters = new TokenValidationParameters
         {
-            ValidateAudience = false,
-            RoleClaimType = "role",  
+            ValidateAudience = true,
+            ValidAudience = "IdentityServerApi",
+
+            ValidateIssuer = true,
+            ValidIssuer = iamSettings.Url,
+
+            RoleClaimType = "http://schemas.microsoft.com/ws/2008/06/identity/claims/role",
             NameClaimType = "sub"
         };
     });
 
-//  Authorization
 builder.Services.AddAuthorization();
+
+builder.Services.AddIntalioInfrastructure(builder.Configuration);
+
+builder.Services.AddHttpContextAccessor();
+
+builder.Services.AddTransient<AuthTokenHandler>();
+
+
+// User Tasks Service
+builder.Services.AddHttpClient<IUserTaskService, UserTaskService>((sp, client) =>
+{
+    var portalSettings = sp
+        .GetRequiredService<Microsoft.Extensions.Options.IOptions<PortalSettings>>()
+        .Value;
+
+    client.BaseAddress = new Uri(portalSettings.BaseUrl);
+})
+.AddHttpMessageHandler<AuthTokenHandler>();
+
+builder.Services.AddHttpClient<IDocumentService, DocumentService>((sp, client) =>
+{
+    var portalSettings = sp
+        .GetRequiredService<Microsoft.Extensions.Options.IOptions<PortalSettings>>()
+        .Value;
+
+    client.BaseAddress = new Uri(portalSettings.BaseUrl);
+})
+.AddHttpMessageHandler<AuthTokenHandler>();
+
+builder.Services.AddHttpClient<IStatusService, StatusService>((sp, client) =>
+{
+    var portalSettings = sp
+        .GetRequiredService<Microsoft.Extensions.Options.IOptions<PortalSettings>>()
+        .Value;
+
+    client.BaseAddress = new Uri(portalSettings.BaseUrl);
+})
+.AddHttpMessageHandler<AuthTokenHandler>();
+
+builder.Services.AddHttpClient<ILookupService, LookupService>((sp, client) =>
+{
+    var portalSettings = sp
+        .GetRequiredService<Microsoft.Extensions.Options.IOptions<PortalSettings>>()
+        .Value;
+
+    client.BaseAddress = new Uri(portalSettings.BaseUrl);
+})
+.AddHttpMessageHandler<AuthTokenHandler>();
+
+
+// User Summary Service
+builder.Services.AddHttpClient<IUserSummaryService, UserSummaryService>((sp, client) =>
+{
+    var portalSettings = sp
+        .GetRequiredService<Microsoft.Extensions.Options.IOptions<PortalSettings>>()
+        .Value;
+
+    client.BaseAddress = new Uri(portalSettings.BaseUrl);
+})
+.AddHttpMessageHandler<AuthTokenHandler>();
+
+builder.Services.AddHttpClient<IAuthService, AuthService>((sp, client) =>
+{
+    var iam = sp
+        .GetRequiredService<Microsoft.Extensions.Options.IOptions<IamSettings>>()
+        .Value;
+
+    client.BaseAddress = new Uri(iam.Url);
+});
 
 builder.Services.AddCors(options =>
 {
-    options.AddPolicy("AllowAll",
-        policy =>
-        {
-            policy.AllowAnyOrigin()
-                  .AllowAnyHeader()
-                  .AllowAnyMethod();
-        });
+    options.AddPolicy("AllowAll", policy =>
+    {
+        policy.AllowAnyOrigin()
+              .AllowAnyHeader()
+              .AllowAnyMethod();
+    });
 });
 
-var app = builder.Build();
+IntalioConfigurator.Configure(builder.Configuration);
 
+var app = builder.Build();
 
 if (app.Environment.IsDevelopment())
 {
@@ -89,13 +172,12 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
-//  Enable CORS
 app.UseCors("AllowAll");
 
-app.UseAuthentication(); 
+app.UseAuthentication();
 app.UseAuthorization();
 
-//  Map Controllers
 app.MapControllers();
 
 app.Run();
+

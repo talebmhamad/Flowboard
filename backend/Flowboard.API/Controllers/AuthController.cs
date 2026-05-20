@@ -1,4 +1,4 @@
-﻿using Flowboard.API.DTOs;
+﻿using Flowboard.Application.DTOs;
 using Flowboard.Application.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 

@@ -1,0 +1,109 @@
+/* Dashboard Container - Light Mode */
+.dashboard-container {
+  padding: 40px;
+  background-color: #f8fafc; /* Soft off-white */
+  min-height: 100vh;
+}
+
+/* Stats Cards */
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 24px;
+  margin-bottom: 50px;
+}
+
+.stat-card {
+  background: #ffffff; /* Pure white */
+  border: 1px solid #e2e8f0; /* Soft border */
+  padding: 28px;
+  border-radius: 20px;
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  transition: all 0.3s ease;
+  /* Soft elevation shadow */
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
+}
+
+.stat-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+  border-color: #3b82f6;
+}
+
+.stat-content h3 {
+  font-size: 2.2rem;
+  font-weight: 700;
+  margin: 0;
+  color: #0f172a; /* Deep dark text */
+  letter-spacing: -1px;
+}
+
+.stat-content p {
+  color: #64748b; /* Muted slate */
+  margin: 2px 0;
+  font-weight: 600;
+  text-transform: uppercase;
+  font-size: 0.75rem;
+  letter-spacing: 0.5px;
+}
+
+.today-tag {
+  font-size: 0.7rem;
+  background: #eff6ff; /* Light blue tint */
+  padding: 4px 10px;
+  border-radius: 6px;
+  color: #2563eb; /* Stronger blue */
+  display: inline-block;
+  margin-top: 8px;
+  font-weight: 600;
+}
+
+/* Section Header */
+.section-header h2 {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #1e293b;
+  margin-bottom: 24px;
+}
+
+/* Workflow Grid */
+.workflow-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 24px;
+}
+
+.workflow-cards {
+  background: #ffffff;
+  border-radius: 20px;
+  border: 1px solid #e2e8f0;
+  padding: 30px;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+}
+
+.workflow-cards:hover {
+  background: #f1f5f9;
+  border-color: #3b82f6;
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+}
+
+.wf-icon-box {
+  color: #3b82f6;
+}
+
+.workflow-card h4 {
+  color: #0f172a;
+  font-size: 1.15rem;
+}
+
+.workflow-card p {
+  color: #64748b;
+}
+
+.launch-hint {
+  color: #2563eb;
+}
