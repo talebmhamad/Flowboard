@@ -26,16 +26,21 @@
     <ProjectReference Include="..\Flowboard.Application\Flowboard.Application.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Reference Include="Intalio.Case.Core">
-      <HintPath>..\..\..\..\intalio\Sites\Case-Packages\Intalio.Case.Portal\Intalio.Case.Core.dll</HintPath>
-    </Reference>
-    <Reference Include="Intalio.Case.Portal.Core">
-      <HintPath>..\..\..\..\intalio\Sites\Case-Packages\Intalio.Case.Portal\Intalio.Case.Portal.Core.dll</HintPath>
-    </Reference>
-    <Reference Include="Intalio.Core">
-      <HintPath>..\..\..\..\intalio\Sites\Case-Packages\Intalio.Case.Portal\Intalio.Core.dll</HintPath>
-    </Reference>
-  </ItemGroup>
+	<ItemGroup>
+		<Reference Include="Intalio.Case.Core">
+			<HintPath>..\libs\Intalio.Case.Core.dll</HintPath>
+			<Private>true</Private>
+		</Reference>
+
+		<Reference Include="Intalio.Case.Portal.Core">
+			<HintPath>..\libs\Intalio.Case.Portal.Core.dll</HintPath>
+			<Private>true</Private>
+		</Reference>
+
+		<Reference Include="Intalio.Core">
+			<HintPath>..\libs\Intalio.Core.dll</HintPath>
+			<Private>true</Private>
+		</Reference>
+	</ItemGroup>
 
 </Project>
