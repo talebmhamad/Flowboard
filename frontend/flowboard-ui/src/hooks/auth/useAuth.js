@@ -16,10 +16,16 @@ export const useLogin = () => {
       setError(null);
 
       const data = await authService.login(username, password);
-
       sessionStorage.setItem("token", data.token);
 
+      window.IdentityAccessToken = data.token;
+
       const user = getUserFromToken();
+
+      sessionStorage.setItem("userId", user.userId);
+
+      window.hdUserId = user.userId;
+
       setUser(user);
 
       return true;

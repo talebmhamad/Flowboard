@@ -1,5 +1,4 @@
 ﻿using Flowboard.Intalio.Context;
-using Flowboard.Intalio.Helpers;
 
 namespace Flowboard.Intalio.Repositories
 {
@@ -12,13 +11,14 @@ namespace Flowboard.Intalio.Repositories
             _db = db;
         }
 
-        public async Task<List<UserLookup>> GetUsersByManagerIdAsync(int managerId)
+        public async Task<List<UserLookupDto>> GetUsersByManagerIdAsync(int managerId)
         {
             var users = _db.Users
                 .Where(x => x.ManagerId == managerId)
-                .Select(x => new UserLookup
+                .Select(x => new UserLookupDto
                 {
-                    Id = x.Id
+                    Id = x.Id,
+                    Name = x.FirstName + " " + x.LastName,
                 })
                 .ToList();
 
