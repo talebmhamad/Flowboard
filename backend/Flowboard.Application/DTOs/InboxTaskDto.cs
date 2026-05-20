@@ -1,6 +1,4 @@
-﻿using System;
-
-
+﻿
 namespace Flowboard.Application.DTOs
 {
     public class InboxTaskDto
@@ -11,13 +9,13 @@ namespace Flowboard.Application.DTOs
 
         public int? DocumentTypeId { get; set; }
 
-        public string DocumentType { get; set; }
+        public string? DocumentType { get; set; }
 
-        public string ReferenceNumber { get; set; }
+        public string? ReferenceNumber { get; set; }
 
         public long? OwnerUserId { get; set; }
 
-        public string OwnerUserName { get; set; }
+        public string? OwnerUserName { get; set; }
 
         public DateTime? CreatedDate { get; set; }
 
@@ -29,7 +27,7 @@ namespace Flowboard.Application.DTOs
 
         public int? StatusId { get; set; }
 
-        public string StatusName { get; set; }
+        public string? StatusName { get; set; }
 
         public bool? IsAssigned { get; set; }
 
@@ -41,8 +39,8 @@ namespace Flowboard.Application.DTOs
 
         public bool? IsOverdue { get; set; }
 
-        public string Instruction { get; set; }
+        public string? Instruction { get; set; }
 
-        public string ReplyInstruction { get; set; }
+        public string? ReplyInstruction { get; set; }
     }
 }
