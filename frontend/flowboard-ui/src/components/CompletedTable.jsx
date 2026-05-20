@@ -1,10 +1,10 @@
 import React, { useEffect, useState } from "react";
 import DataTableModule from "react-data-table-component";
-import { getCompletedTasks } from "../services/taskService";
+import { getCompletedTasks } from "../services/taskService"
 import TaskFilters from "./TaskFilters";
-import "../styles/Inbox.css";
-import { useStatuses } from "../hooks/useStatuses";
+import { useStatuses } from "../hooks/status/useStatuses";
 import DocumentMetadata from "./DocumentMetadata"; 
+import { getStatusBadgeClass } from "../utils/statusBadge";
 
 export default function CompletedTable({ documentTypes = [] }) {
   const DataTable = DataTableModule.default;
@@ -135,23 +135,20 @@ export default function CompletedTable({ documentTypes = [] }) {
       selector: (row) => row.createdDate || "-",
       sortable: true,
     },
-    {
-      name: "Status",
-      cell: (row) => {
-        const status = statusMap[row.status];
-        return (
-          <span
-            className="status-badge"
-            style={{
-              backgroundColor: status?.color || "#ccc",
-              color: "#fff",
-            }}
-          >
-            {status?.label || "Unknown"}
-          </span>
-        );
-      },
-    },
+   {
+  name: "Status",
+  cell: (row) => {
+    const status = statusMap[row.status];
+
+    return (
+      <span
+        className={`badge rounded-pill px-3 py-2 ${getStatusBadgeClass(status?.label)}`}
+      >
+        {status?.label || "Unknown"}
+      </span>
+    );
+  },
+},
     {
       name: "",
       width: "80px",
@@ -164,7 +161,6 @@ export default function CompletedTable({ documentTypes = [] }) {
         </button>
       ),
       ignoreRowClick: true,
-      allowOverflow: true,
       button: true,
     },
   ];
@@ -176,11 +172,11 @@ export default function CompletedTable({ documentTypes = [] }) {
         <div className="d-flex justify-content-between mb-3">
           <h5>Application Metadata</h5>
 
-          <button
-            className="btn btn-outline-secondary btn-sm"
-            onClick={() => setSelectedTaskId(null)}
-          >
-            ← Back
+           <button
+           className="btn btn-outline-secondary btn-sm"
+           onClick={() => setSelectedTaskId(null)}
+           ><i className="bi bi-arrow-left me-1" />
+            Back
           </button>
         </div>
 

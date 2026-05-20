@@ -1,5 +1,4 @@
-﻿using Flowboard.Intalio.Helpers;
-using Flowboard.Intalio.Interfaces;
+﻿using Flowboard.Intalio.Interfaces;
 using Flowboard.Intalio.Repositories;
 
 namespace Flowboard.Intalio.Services
@@ -13,7 +12,7 @@ namespace Flowboard.Intalio.Services
             _repository = repository;
         }
 
-        public async Task<List<UserLookup>> GetEmployeesByManagerIdAsync(int managerId)
+        public async Task<List<UserLookupDto>> GetEmployeesByManagerIdAsync(int managerId)
         {
             return await _repository.GetUsersByManagerIdAsync(managerId);
         }

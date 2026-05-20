@@ -1,231 +1,174 @@
-import React, { useEffect, useState } from "react";
-import DataTableModule from "react-data-table-component";
-import { useNavigate } from "react-router-dom";
+import React, {
+  useEffect,
+  useMemo,
+  useCallback,
+} from "react";
 
-import { getActiveTasks } from "../services/taskService";
+import { useNavigate, useOutletContext } from "react-router-dom";
+import DataTableModule from "react-data-table-component";
 import TaskFilters from "./TaskFilters";
-import "../styles/Inbox.css";
-import { useStatuses } from "../hooks/useStatuses";
-import { useOutletContext } from "react-router-dom";
+import useInboxFilters from "../hooks/inbox/useInboxFilters";
+import useInboxTasks from "../hooks/inbox/useInboxTasks";
+import useInboxColumns from "../hooks/inbox/useInboxColumns";
+import { useStatuses } from "../hooks/status/useStatuses";
 
 export default function InboxTable() {
   const DataTable = DataTableModule.default;
-
+  const {formState,initialFormState,handleInputChange,resetFilters,} = useInboxFilters();
   const navigate = useNavigate();
-
-  //  get workflows from context (routing)
   const { workflows = [] } = useOutletContext();
-
-  const [tasks, setTasks] = useState([]);
-  const [loading, setLoading] = useState(true);
   const { statuses } = useStatuses();
+  const {tasks,loading,totalRows,page,setPage,pageSize,setPageSize,loadInbox,} = useInboxTasks();
 
-  const [page, setPage] = useState(1);
-  const [pageSize, setPageSize] = useState(10);
-  const [totalRows, setTotalRows] = useState(0);
+ useEffect(() => {
 
-  const initialFormState = {
-    refNumber: "",
-    fromDate: "",
-    toDate: "",
-    docType: null,
-    status: null,
-    read: false,
-    locked: false,
-    assigned: false,
-    overdue: false,
-  };
+   loadInbox(initialFormState, 1, pageSize);
 
-  const [formState, setFormState] = useState(initialFormState);
+  }, [pageSize]);
 
-  useEffect(() => {
-    loadInbox(initialFormState, 1, pageSize);
-  }, []);
+  const handleSearch = useCallback(() => {
 
-  const loadInbox = async (filters, pageNumber = 1, size = 10) => {
-    try {
-      setLoading(true);
+  setPage(1);
 
-      const request = {
-        draw: 1,
-        start: (pageNumber - 1) * size,
-        length: size,
-        nodeId: 2,
+  loadInbox(formState, 1, pageSize);
 
-        documentTypeId: filters.docType?.value || 0,
-        statusId: filters.status?.value || 0,
-        referenceNumber: filters.refNumber || "",
+  }, [formState, pageSize, loadInbox, setPage]);
 
-        fromDate: filters.fromDate
-          ? new Date(filters.fromDate).toISOString()
-          : null,
-        toDate: filters.toDate
-          ? new Date(filters.toDate).toISOString()
-          : null,
+  const handleClear = useCallback(() => {
 
-        read: filters.read,
-        locked: filters.locked,
-        assigned: filters.assigned,
-        overdue: filters.overdue,
-      };
+  resetFilters();
 
-      const res = await getActiveTasks(request);
+  setPage(1);
 
-      const mapped = (res.data || []).map((t) => ({
-        ...t,
-        status: t.status || "Pending",
-      }));
+  loadInbox(initialFormState, 1, pageSize);
 
-      setTasks(mapped);
-      setTotalRows(res.recordsFiltered || 0);
-    } catch (err) {
-      console.error("Inbox error:", err);
-    } finally {
-      setLoading(false);
-    }
-  };
+}, [
+  resetFilters,
+  setPage,
+  loadInbox,
+  initialFormState,
+  pageSize
+  ]);
 
-  const handleInputChange = (e) => {
-    const { name, value, type, checked } = e.target;
+  const handlePageChange = useCallback((p) => {
 
-    setFormState((prev) => ({
-      ...prev,
-      [name]: type === "checkbox" ? checked : value,
-    }));
-  };
+  setPage(p);
 
-  const handleSearch = () => {
-    setPage(1);
-    loadInbox(formState, 1, pageSize);
-  };
+  loadInbox(formState, p, pageSize);
 
-  const handleClear = () => {
-    setFormState(initialFormState);
-    setPage(1);
-    loadInbox(initialFormState, 1, pageSize);
-  };
+}, [
+  formState,
+  pageSize,
+  loadInbox,
+  setPage
+  ]);
 
-  const handlePageChange = (p) => {
-    setPage(p);
-    loadInbox(formState, p, pageSize);
-  };
+  const handlePerRowsChange = useCallback((newSize, p) => {
 
-  const handlePerRowsChange = (newSize, p) => {
-    setPageSize(newSize);
-    loadInbox(formState, p, newSize);
-  };
+  setPageSize(newSize);
 
-  //   use workflows instead of props
-  const docTypeOptions = (workflows || []).map((wf) => ({
+  loadInbox(formState, p, newSize);
+
+}, [
+  formState,
+  loadInbox,
+  setPageSize
+  ]);
+
+  const docTypeOptions = useMemo(() => {
+
+  return (workflows || []).map((wf) => ({
     value: wf.id,
     label: wf.text,
   }));
 
-  const statusOptions = statuses.map((s) => ({
+  }, [workflows]);
+
+  const statusOptions = useMemo(() => {
+
+  return statuses.map((s) => ({
     value: s.id,
     label: s.text,
     color: s.color || "#888",
   }));
 
-  const statusMap = Object.fromEntries(
-    statusOptions.map((s) => [s.value, s])
+  }, [statuses]);
+
+  const statusMap = useMemo(() => {
+
+  return Object.fromEntries(
+    statusOptions.map((s) => [
+      s.value,
+      s,
+    ])
   );
 
-  //   ROUTING instead of state
-  const handleEdit = (row) => {
-    navigate(`/dashboard/form/task/${row.id}`, {
-    state: { from: "/dashboard/inbox" }
-    });
-  };
+  }, [statusOptions]);
 
-  const columns = [
-    {
-      name: "Document Type",
-      selector: (row) => row.documentType || "N/A",
-      sortable: true,
-    },
-    {
-      name: "Reference Number",
-      selector: (row) => row.referenceNumber || "---",
-      sortable: true,
-    },
-    {
-      name: "Task Date",
-      selector: (row) => row.taskDate || "-",
-      sortable: true,
-    },
-    {
-      name: "Created Date",
-      selector: (row) => row.createdDate || "-",
-      sortable: true,
-    },
-    {
-      name: "Status",
-      cell: (row) => {
-        const status = statusMap[row.status];
-        return (
-          <span
-            className="status-badge"
-            style={{
-              backgroundColor: status?.color || "#ccc",
-              color: "#fff",
-            }}
-          >
-            {status?.label || "Unknown"}
-          </span>
-        );
-      },
-    },
-    {
-      name: "",
-      width: "80px",
-      cell: (row) => (
-        <button
-          className="btn btn-sm btn-outline-primary"
-          onClick={() => handleEdit(row)}
-        >
-          <i className="bi bi-pencil"></i>
-        </button>
-      ),
-      ignoreRowClick: true,
-      allowOverflow: true,
-      button: true,
-    },
-  ];
+  const handleEdit = useCallback((row) => {
+
+  const taskStatus = statusMap[row.status];
+
+  navigate(`/dashboard/form/task/${row.id}`, {
+    state: {
+      from: "/dashboard/inbox",
+      status: taskStatus
+    }
+  });
+
+  }, [navigate, statusMap]);
+
+  const columns = useInboxColumns({ statusMap, handleEdit });
 
   return (
-    <div className="inbox-container">
 
- <TaskFilters
-  storageKey="inboxFilters"  
-  formState={formState}
-  handleInputChange={handleInputChange}
-  handleSearch={handleSearch}
-  handleClear={handleClear}
-  docTypeOptions={docTypeOptions}
-  statusOptions={statusOptions}
-  IsCompletedTable={true}
-  IsDraftTable={false}
- />
+  <div className="inbox-container">
 
-      <div className="table-wrapper">
-        <DataTable
-          key="inbox-table"
-          columns={columns}
-          data={tasks}
-          progressPending={loading && tasks.length === 0}
-          pagination
-          paginationServer
-          paginationTotalRows={totalRows}
-          paginationPerPage={pageSize}
-          onChangePage={handlePageChange}
-          onChangeRowsPerPage={handlePerRowsChange}
-          highlightOnHover
-          striped
-          responsive
-          persistTableHead
-        />
-      </div>
+    {/* Filters */}
+    <TaskFilters
+      storageKey="inboxFilters"
+      formState={formState}
+      handleInputChange={handleInputChange}
+      handleSearch={handleSearch}
+      handleClear={handleClear}
+      docTypeOptions={docTypeOptions}
+      statusOptions={statusOptions}
+      IsCompletedTable={true}
+      IsDraftTable={false}
+    />
+
+    {/* Table */}
+    <div className="table-wrapper">
+      <DataTable
+        key="inbox-table"
+        columns={columns}
+        data={tasks}
+
+        progressPending={
+          loading && tasks.length === 0
+        }
+
+        pagination
+        paginationServer
+
+        paginationTotalRows={totalRows}
+
+        paginationPerPage={pageSize}
+
+        onChangePage={handlePageChange}
+
+        onChangeRowsPerPage={
+          handlePerRowsChange
+        }
+
+        highlightOnHover
+        striped
+        responsive
+        persistTableHead
+      />
     </div>
+
+  </div>
   );
+
 }

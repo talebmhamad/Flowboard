@@ -1,5 +1,4 @@
-﻿using Intalio.Case.Core;
-using Intalio.Core;
+﻿using Intalio.Core;
 using Microsoft.Extensions.Configuration;
 
 namespace Flowboard.Infrastructure.Configurations

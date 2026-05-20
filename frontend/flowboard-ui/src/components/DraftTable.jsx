@@ -2,10 +2,9 @@ import React, { useEffect, useState } from "react";
 import DataTableModule from "react-data-table-component";
 import { useOutletContext, useNavigate } from "react-router-dom";
 
+
 import { getDraftTasks } from "../services/taskService";
 import TaskFilters from "./TaskFilters";
-
-import "../styles/Inbox.css";
 
 export default function DraftTable() {
   const DataTable = DataTableModule.default;
@@ -137,7 +136,6 @@ export default function DraftTable() {
         </button>
       ),
       ignoreRowClick: true,
-      allowOverflow: true,
       button: true,
     },
   ];

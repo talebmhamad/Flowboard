@@ -6,7 +6,6 @@ import { AppProvider } from "./context/AppContext";
 
 // Pages
 import Login from "./pages/Login";
-import UserDashboard from "./pages/dashboard/Dashboard";
 
 // Components
 import ProtectedRoute from "./components/ProtectedRoute";
@@ -17,6 +16,7 @@ import InboxTable from "./components/InboxTable";
 import CompleteTable from "./components/CompletedTable";
 import DraftTable from "./components/DraftTable";
 import TrackingTable from "./components/TrackingTable";
+import DashboardContainer from "./pages/dashboard/DashboardContainer";
 
 function App() {
   return (
@@ -31,7 +31,7 @@ function App() {
           path="/dashboard"
           element={
             <ProtectedRoute>
-              <UserDashboard />
+              <DashboardContainer />
             </ProtectedRoute>
           }
         >

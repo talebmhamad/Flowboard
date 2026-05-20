@@ -1,4 +1,4 @@
-node_modules
-dist
-.git
-.vscode
+node_modules/
+dist/
+.vscode/
+.claude/

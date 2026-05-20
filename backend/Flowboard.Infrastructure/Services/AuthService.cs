@@ -1,11 +1,7 @@
 ﻿using Flowboard.Application.Interfaces;
 using Flowboard.Infrastructure.Settings;
 using Microsoft.Extensions.Options;
-using System;
-using System.Collections.Generic;
-using System.Net.Http;
 using System.Text.Json;
-using System.Threading.Tasks;
 
 namespace Flowboard.Infrastructure.Services
 {

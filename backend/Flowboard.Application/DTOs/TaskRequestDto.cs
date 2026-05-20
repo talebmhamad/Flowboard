@@ -14,7 +14,7 @@ namespace Flowboard.Application.DTOs
         public int NodeId { get; set; }
         public int DocumentTypeId { get; set; }
         public int StatusId { get; set; }
-        public string ReferenceNumber { get; set; }
+        public string? ReferenceNumber { get; set; }
         public DateTime? FromDate { get; set; }
         public DateTime? ToDate { get; set; }
 

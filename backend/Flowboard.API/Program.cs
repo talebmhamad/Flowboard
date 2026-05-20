@@ -1,9 +1,9 @@
 ﻿using Flowboard.Application.Interfaces;
+using Flowboard.Application.Services;
 using Flowboard.Infrastructure.Handlers;
 using Flowboard.Infrastructure.Services;
 using Flowboard.Infrastructure.Settings;
 using Flowboard.Intalio.Configurations;
-using Flowboard.Intalio.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
@@ -83,10 +83,10 @@ builder.Services.AddAuthorization();
 
 builder.Services.AddIntalioInfrastructure(builder.Configuration);
 
-
 builder.Services.AddHttpContextAccessor();
 
 builder.Services.AddTransient<AuthTokenHandler>();
+
 
 // User Tasks Service
 builder.Services.AddHttpClient<IUserTaskService, UserTaskService>((sp, client) =>
@@ -110,6 +110,16 @@ builder.Services.AddHttpClient<IDocumentService, DocumentService>((sp, client) =
 .AddHttpMessageHandler<AuthTokenHandler>();
 
 builder.Services.AddHttpClient<IStatusService, StatusService>((sp, client) =>
+{
+    var portalSettings = sp
+        .GetRequiredService<Microsoft.Extensions.Options.IOptions<PortalSettings>>()
+        .Value;
+
+    client.BaseAddress = new Uri(portalSettings.BaseUrl);
+})
+.AddHttpMessageHandler<AuthTokenHandler>();
+
+builder.Services.AddHttpClient<ILookupService, LookupService>((sp, client) =>
 {
     var portalSettings = sp
         .GetRequiredService<Microsoft.Extensions.Options.IOptions<PortalSettings>>()

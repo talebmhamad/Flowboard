@@ -1,11 +1,11 @@
 import { useEffect, useRef, useCallback } from "react";
 import "../styles/WorkflowForm.css";
-import { useDocument } from "../hooks/useDocument";
+import { useDocument } from "../hooks/document/useDocument";
 import { showSuccess, showError, showWarning } from "../utils/toast";
 import { useAppContext } from "../context/AppContext";
 import { getUserSummary } from "../services/userService";
 
-export default function WorkflowFormContent({ data, onBack }) {
+export default function WorkflowFormContent({ data, workflowTitle,onBack }) {
   const formRef = useRef(null);
   const formInstanceRef = useRef(null);
   const { save, saveAndSend, saving, sending } = useDocument();
@@ -47,7 +47,7 @@ export default function WorkflowFormContent({ data, onBack }) {
       console.error(err);
       showError("Save failed");
     }
-  }, [data, save, saving]);
+  }, [data, save, saving, setSummary, onBack]);
 
   //  SEND
   const handleSend = useCallback(async () => {
@@ -85,7 +85,7 @@ export default function WorkflowFormContent({ data, onBack }) {
       console.error(err);
       showError("Send failed");
     }
-  }, [data, saveAndSend, sending]);
+  }, [data, saveAndSend, sending, setSummary, onBack]);
 
   //  FORM INIT
   useEffect(() => {
@@ -153,40 +153,63 @@ export default function WorkflowFormContent({ data, onBack }) {
       if (formRef.current) formRef.current.innerHTML = "";
       formInstanceRef.current = null;
     };
+    console.log(data.form)
   }, [data?.form]);
 
   return (
     <div className="workflow-container">
+      <div className="workflow-card">
       <div className="workflow-header-row">
         <h2 className="form-title">
-          {data.workflow?.text || data.workflow?.name || "Workflow"}
+          {workflowTitle || "Workflow"}
         </h2>
         
-        <button className="btn btn-outline-secondary btn-sm" onClick={onBack}>
+        <button className="btn btn-outline-secondary btn-sm" onClick={() => onBack()}>
     <i className="bi bi-arrow-left me-2"></i> Back
         </button>
       </div>
 
-      <div className="workflow-card">
         <div ref={formRef} />
-        <div className="form-actions">
-          <div className="btn-group">
-<button
-  className="btn btn-success" 
-  onClick={handleSave}
-  disabled={saving}
->
-  {saving ? "Saving..." : "Save"}
-</button>
+        {/* ACTION BUTTONS */}
 
-<button
-  className="btn btn-primary" 
-  onClick={handleSend}
-  disabled={sending}
->
-  {sending ? "Sending..." : "Send"}
-</button>
+        <div className="d-flex justify-content-end mt-4">
+
+          <div className="btn-group shadow-sm">
+
+            <button
+              className="btn btn-success px-4"
+              onClick={handleSave}
+              disabled={saving}
+            >
+
+              <i className="bi bi-save me-2"></i>
+
+              {
+                saving
+                  ? "Saving..."
+                  : "Save"
+              }
+
+            </button>
+
+            <button
+              className="btn btn-primary px-4"
+              onClick={handleSend}
+              disabled={sending}
+            >
+
+              <i className="bi bi-send me-2"></i>
+
+              {
+                sending
+                  ? "Sending..."
+                  : "Send"
+              }
+
+            </button>
+
           </div>
+
         </div>
       </div>
     </div>

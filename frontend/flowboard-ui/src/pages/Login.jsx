@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useLogin } from "../hooks/useAuth"; // 👈 your updated hook
+import { useLogin } from "../hooks/auth/useAuth";
 import { Eye, EyeOff, Lock, User } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 

@@ -1,4 +1,11 @@
-bin
-obj
-.vs
+**/bin
+**/obj
+**/.vs
+**/.vscode
+**/node_modules
+**/dist
 .git
+.gitignore
+Dockerfile
+docker-compose.yml
+README.md
