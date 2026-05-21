@@ -1,0 +1,15 @@
+services:
+
+  api:
+    image: flowboard-api
+    container_name: flowboard-api-container
+    ports:
+      - "8080:8080"
+
+  ui:
+    image: flowboard-ui
+    container_name: flowboard-ui-container
+    ports:
+      - "3000:80"
+    depends_on:
+      - api

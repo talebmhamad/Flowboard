@@ -31,10 +31,8 @@
 			<HintPath>..\libs\Intalio.Case.Core.dll</HintPath>
 			<Private>true</Private>
 		</Reference>
-
 		<Reference Include="Intalio.Case.Portal.Core">
-			<HintPath>..\libs\Intalio.Case.Portal.Core.dll</HintPath>
-			<Private>true</Private>
+		  <HintPath>..\libs\Intalio.Case.Portal.Core.dll</HintPath>
 		</Reference>
 
 		<Reference Include="Intalio.Core">
