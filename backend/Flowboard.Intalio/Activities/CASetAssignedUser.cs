@@ -10,7 +10,7 @@ namespace Flowboard.Intalio.Activities
         {
             try
             {
-                var assignedUser =
+                var assignedUser = 
                     workflowItem.Properties["assignedUser"]?.Value;
 
                 Property assignedUserProp = workflowItem!.Properties.FirstOrDefault(x => x.Name == "assignedUser")!;
