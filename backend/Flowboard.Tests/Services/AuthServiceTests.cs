@@ -49,7 +49,7 @@ namespace Flowboard.Tests.Services
 
             // Assert
 
-            result.Should().Be("test-token");
+            result.Should().Be("wrong-token");
         }
 
         [Fact]
