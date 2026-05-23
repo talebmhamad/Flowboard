@@ -1,5 +1,5 @@
 export const API_URL =
-  import.meta.env.VITE_API_URL;
+  window.APP_CONFIG.API_URL;
 
 window.FlowBoardUrl = API_URL;
 

@@ -1,12 +1,18 @@
 services:
 
   api:
+    build:
+      context: ./backend/Flowboard.API
+      dockerfile: Dockerfile
     image: flowboard-api
     container_name: flowboard-api-container
     ports:
       - "8080:8080"
 
   ui:
+    build:
+      context: ./frontend/flowboard-ui
+      dockerfile: Dockerfile
     image: flowboard-ui
     container_name: flowboard-ui-container
     ports:
