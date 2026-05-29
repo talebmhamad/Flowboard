@@ -1,3 +1,3 @@
 window.APP_CONFIG = {
-    API_URL: "https://localhost:7129/api"
+    API_URL: "http://192.168.1.105:7129/api"
 };

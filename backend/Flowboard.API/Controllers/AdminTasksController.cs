@@ -15,9 +15,7 @@ namespace Flowboard.API.Controllers
         private readonly IUserExtensionService _userService;
         private readonly ITaskService _taskService;
 
-        public AdminTasksController(
-            IUserExtensionService userService,
-            ITaskService taskService)
+        public AdminTasksController(IUserExtensionService userService,ITaskService taskService)
         {
             _userService = userService;
             _taskService = taskService;
