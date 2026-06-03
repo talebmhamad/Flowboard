@@ -1,12 +1,6 @@
-﻿// Services/LookupService.cs
-
-using Flowboard.Application.DTOs;
+﻿using Flowboard.Application.DTOs;
 using Flowboard.Application.Interfaces;
-using System;
-using System.Collections.Generic;
-using System.Net.Http;
 using System.Text.Json;
-using System.Threading.Tasks;
 
 namespace Flowboard.Application.Services
 {
@@ -19,10 +13,7 @@ namespace Flowboard.Application.Services
             _http = http;
         }
 
-        public async Task<List<LookupItemDto>> GetLookupItemsByNameAsync(
-            string name,
-            int language
-        )
+        public async Task<List<LookupItemDto>> GetLookupItemsByNameAsync(string name,int language)
         {
             var response = await _http.GetAsync(
                 $"Lookup/GetLookupItemsByName?name={name}&language={language}"
@@ -41,6 +32,24 @@ namespace Flowboard.Application.Services
                 });
 
             return data ?? new List<LookupItemDto>();
+        }
+        public async Task<JsonElement> SearchUsersAsync(string text,bool showOnlyActiveUsers,int? language)
+        {
+            var url =
+                $"Api/SearchUsers?text={Uri.EscapeDataString(text ?? "")}" +
+                $"&showOnlyActiveUsers={showOnlyActiveUsers.ToString().ToLower()}";
+
+            if (language.HasValue)
+                url += $"&language={language.Value}";
+
+            var response = await _http.GetAsync(url);
+
+            if (!response.IsSuccessStatusCode)
+                throw new Exception("Failed to search users");
+
+            var json = await response.Content.ReadAsStringAsync();
+
+            return JsonSerializer.Deserialize<JsonElement>(json);
         }
     }
 }
