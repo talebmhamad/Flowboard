@@ -19,7 +19,6 @@ public class AuthController : ControllerBase
         try
         {
             var token = await _authService.LoginAsync(dto.Username, dto.Password);
-
             return Ok(new { token });
         }
         catch (Exception ex)
@@ -27,6 +26,4 @@ public class AuthController : ControllerBase
             return Unauthorized(new { message = ex.Message });
         }
     }
-
- 
 }

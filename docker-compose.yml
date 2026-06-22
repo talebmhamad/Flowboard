@@ -1,12 +1,26 @@
 services:
 
   api:
+    build:
+      context: ./backend        
+      dockerfile: Flowboard.API/Dockerfile  
     image: flowboard-api
     container_name: flowboard-api-container
     ports:
       - "8080:8080"
+    environment:
+      - Portal__BaseUrl=${PORTAL_URL}
+      - Intalio__BaseUrl=${INTALIO_URL}
+      - IAM__Url=${INTALIO_URL}
+      - IAM__ClientId=${IAM_CLIENT_ID}
+      - IAM__ClientSecret=${IAM_CLIENT_SECRET}
+      - ConnectionStrings__CaseConnection=${CASE_CONNECTION}
+      - ConnectionStrings__IAMConnection=${IAM_CONNECTION}
 
   ui:
+    build:
+      context: ./frontend/flowboard-ui
+      dockerfile: Dockerfile
     image: flowboard-ui
     container_name: flowboard-ui-container
     ports:

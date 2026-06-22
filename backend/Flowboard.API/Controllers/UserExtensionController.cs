@@ -20,5 +20,7 @@ public class UserExtensionController : ControllerBase
         var result = await _userService.GetEmployeesByManagerIdAsync(ManagerId);
         return Ok(result);
     }
+
+   
   
 }

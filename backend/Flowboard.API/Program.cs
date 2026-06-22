@@ -1,4 +1,6 @@
-﻿using Flowboard.Application.Interfaces;
+﻿using Flowboard.API.DTOs;
+using Flowboard.Application.Interfaces;
+using Flowboard.Application.Interfaces.Flowboard.Application.Interfaces;
 using Flowboard.Application.Services;
 using Flowboard.Infrastructure.Handlers;
 using Flowboard.Infrastructure.Services;
@@ -79,6 +81,8 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
         };
     });
 
+builder.Services.AddScoped<ICvExtractionService, CvExtractionService>();
+
 builder.Services.AddAuthorization();
 
 builder.Services.AddIntalioInfrastructure(builder.Configuration);
@@ -86,6 +90,10 @@ builder.Services.AddIntalioInfrastructure(builder.Configuration);
 builder.Services.AddHttpContextAccessor();
 
 builder.Services.AddTransient<AuthTokenHandler>();
+
+builder.Services.AddHttpClient();
+
+builder.Services.Configure<GeminiSettings>(builder.Configuration.GetSection("Gemini"));
 
 
 // User Tasks Service
@@ -180,4 +188,6 @@ app.UseAuthorization();
 app.MapControllers();
 
 app.Run();
+
+public partial class Program { }
 

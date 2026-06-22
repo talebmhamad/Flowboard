@@ -1,6 +1,5 @@
 ﻿using Flowboard.Application.DTOs;
-using System.Collections.Generic;
-using System.Threading.Tasks;
+using System.Text.Json;
 
 namespace Flowboard.Application.Interfaces
 {
@@ -10,5 +9,11 @@ namespace Flowboard.Application.Interfaces
             string name,
             int language
         );
+
+        Task<JsonElement> SearchUsersAsync(
+    string text,
+    bool showOnlyActiveUsers,
+    int? language
+);
     }
 }
